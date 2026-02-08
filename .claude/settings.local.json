@@ -7,7 +7,9 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(aws ec2 describe-instances:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(test -d:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

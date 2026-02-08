@@ -6,9 +6,6 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 // Pages
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
-import ShipmentsPage from './pages/ShipmentsPage'
-import ShipmentDetailPage from './pages/ShipmentDetailPage'
-import MapPage from './pages/MapPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Components
@@ -34,36 +31,6 @@ function App() {
               <ProtectedRoute isAuthenticated={isAuthenticated}>
                 <Layout>
                   <DashboardPage />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/shipments"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Layout>
-                  <ShipmentsPage />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/shipments/:id"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Layout>
-                  <ShipmentDetailPage />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/map"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Layout>
-                  <MapPage />
                 </Layout>
               </ProtectedRoute>
             }

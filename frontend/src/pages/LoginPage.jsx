@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/authStore'
 import { AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
-  const [isLogin, setIsLogin] = useState(true)
+  const [isLogin] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
@@ -128,16 +128,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <button
-            type="button"
-            onClick={() => {
-              setIsLogin(!isLogin)
-              setError('')
-            }}
-            className="w-full mt-4 text-blue-600 hover:text-blue-700 text-sm font-semibold"
-          >
-            {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
-          </button>
         </div>
       </div>
     </div>
