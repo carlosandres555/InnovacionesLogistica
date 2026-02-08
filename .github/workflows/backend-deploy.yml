@@ -44,10 +44,12 @@ jobs:
           echo "$EC2_KEY_BASE64" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "SSH key created"
-          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+
+          # Try to add host key, continue if it fails
+          ssh-keyscan -t rsa -T 10 -H $EC2_HOST >> ~/.ssh/known_hosts 2>/dev/null || echo "Warning: ssh-keyscan failed, continuing..."
           echo "SSH known_hosts updated"
 
-          ssh -v $EC2_USER@$EC2_HOST << 'ENDSSH'
+          ssh -o StrictHostKeyChecking=accept-new -v $EC2_USER@$EC2_HOST << 'ENDSSH'
           set -x
           cd /opt/innovaciones-logistica
           echo "Pulling latest code..."
