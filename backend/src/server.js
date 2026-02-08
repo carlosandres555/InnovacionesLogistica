@@ -1,4 +1,4 @@
-// Test deploy - 2026-02-08 - Fixed SSH config
+// Test deploy - 2026-02-08 - Fixed YAML syntax
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
