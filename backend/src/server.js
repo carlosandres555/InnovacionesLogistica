@@ -1,4 +1,4 @@
-// Test deploy - 2026-02-08 - Using AWS SSM + SSH fallback
+// Test deploy - 2026-02-08 - AWS SSM with proper IAM permissions ✅
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
