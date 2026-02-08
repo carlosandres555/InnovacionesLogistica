@@ -13,7 +13,7 @@ USE_STAGING=false
 PROD_EC2_HOST="52.201.18.118"
 PROD_EC2_USER="ubuntu"
 PROD_EC2_PORT="22"
-PROD_EC2_KEY="/Users/carlosrodriguez/.ssh/innovaciones-key.pem"
+PROD_EC2_KEY="$HOME/.ssh/innovaciones-logistica-key.pem"
 PROD_EC2_DEPLOY_PATH="/home/ubuntu/innovaciones-backend"
 
 # ============= STAGING (Para testing antes de PROD) =============
