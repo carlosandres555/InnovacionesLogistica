@@ -19,7 +19,7 @@ set -e
 
 echo "📦 Pulling latest code..."
 cd /opt/innovaciones-logistica
-git pull origin main
+GIT_SSH_COMMAND="ssh -i ~/.ssh/github_key" git pull origin main
 
 echo "📚 Installing backend dependencies..."
 cd backend
