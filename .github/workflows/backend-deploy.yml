@@ -40,37 +40,67 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EC2_INSTANCE_ID: i-02a5cb6ddd9604891
         run: |
-          # Create deployment script file
-          cat > /tmp/deploy.sh << 'DEPLOY_SCRIPT'
-          set -x
+          # Create deployment script
+          DEPLOY_SCRIPT='
+          set -e
           cd /opt/innovaciones-logistica
-          echo "Pulling latest code..."
-          git pull origin main || echo "Git pull failed"
+          echo "🧹 Discarding local changes..."
+          git checkout -- . 2>/dev/null || true
+          echo "📦 Pulling latest code..."
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/github_key" git pull origin main
           cd backend
-          echo "Installing dependencies..."
+          echo "📚 Installing dependencies..."
           npm install
-          echo "Generating Prisma..."
+          echo "🔧 Generating Prisma..."
           npx prisma generate
-          echo "Pushing database..."
+          echo "💾 Pushing database migrations..."
           npx prisma db push --skip-generate
-          echo "Restarting PM2..."
-          pm2 restart innovaciones-api
+          echo "🔄 Restarting PM2..."
+          pm2 restart innovaciones-api --update-env
           echo "✅ Deployment completed"
           pm2 logs innovaciones-api --lines 20
-          DEPLOY_SCRIPT
+          '
 
           # Execute via SSM
-          aws ssm send-command \
+          echo "📤 Sending deployment command to EC2 via AWS Systems Manager..."
+          COMMAND_ID=$(aws ssm send-command \
             --instance-ids $EC2_INSTANCE_ID \
             --document-name "AWS-RunShellScript" \
-            --parameters 'commands=[cat /tmp/deploy.sh | bash]' \
-            --region us-east-1 || echo "SSM failed, trying SSH..."
+            --parameters commands="$DEPLOY_SCRIPT" \
+            --output text \
+            --query 'Command.CommandId')
 
-          # Fallback to SSH if SSM fails
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.EC2_HOST }} 'bash -s' < /tmp/deploy.sh
+          echo "⏳ Waiting for command completion (ID: $COMMAND_ID)..."
+
+          # Wait for command to complete
+          while true; do
+            STATUS=$(aws ssm get-command-invocation \
+              --command-id $COMMAND_ID \
+              --instance-id $EC2_INSTANCE_ID \
+              --query 'Status' \
+              --output text)
+
+            if [ "$STATUS" = "Success" ]; then
+              echo "✅ Deployment successful!"
+              aws ssm get-command-invocation \
+                --command-id $COMMAND_ID \
+                --instance-id $EC2_INSTANCE_ID \
+                --query 'StandardOutputContent' \
+                --output text
+              break
+            elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Cancelled" ]; then
+              echo "❌ Deployment failed!"
+              aws ssm get-command-invocation \
+                --command-id $COMMAND_ID \
+                --instance-id $EC2_INSTANCE_ID \
+                --query 'StandardErrorContent' \
+                --output text
+              exit 1
+            fi
+
+            echo "  Status: $STATUS"
+            sleep 5
+          done
 
       # - name: Notify Slack on failure
       #   if: failure()
