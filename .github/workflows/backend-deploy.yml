@@ -50,7 +50,7 @@ jobs:
           cd backend
           npm install
           npx prisma generate
-          npm run db:migrate --if-present
+          npx prisma db push --skip-generate
           pm2 restart innovaciones-api
           pm2 logs innovaciones-api --lines 20
           ENDSSH
