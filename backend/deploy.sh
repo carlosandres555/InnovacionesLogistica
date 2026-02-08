@@ -153,7 +153,30 @@ rsync -avz \
 
 log_success "Archivos copiados"
 
-# Paso 10: Instalar dependencias en servidor remoto
+# Paso 10: Copiar .env al servidor remoto
+log_info "Configurando variables de entorno en servidor remoto..."
+ssh -i $PROD_EC2_KEY $EC2_USER@$EC2_HOST << EOF
+  set -e
+  cat > $EC2_DEPLOY_PATH/.env << 'ENVFILE'
+NODE_ENV=production
+PORT=3000
+DATABASE_URL="$PROD_DATABASE_URL"
+JWT_SECRET="$(openssl rand -hex 32)"
+JWT_REFRESH_SECRET="$(openssl rand -hex 32)"
+JWT_EXPIRES_IN="15m"
+JWT_REFRESH_EXPIRES_IN="7d"
+FRONTEND_URL="https://innovacioneslogistica.com"
+AWS_REGION="us-east-1"
+AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
+AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
+AWS_S3_BUCKET="$AWS_S3_BUCKET"
+AWS_S3_UPLOADS_BUCKET="$AWS_S3_UPLOADS_BUCKET"
+ENVFILE
+  chmod 600 $EC2_DEPLOY_PATH/.env
+EOF
+log_success "Variables de entorno configuradas"
+
+# Paso 11: Instalar dependencias en servidor remoto
 log_info "Instalando dependencias en servidor remoto..."
 ssh -i $PROD_EC2_KEY $EC2_USER@$EC2_HOST << EOF
   set -e
@@ -163,16 +186,17 @@ ssh -i $PROD_EC2_KEY $EC2_USER@$EC2_HOST << EOF
 EOF
 log_success "Dependencias instaladas en servidor remoto"
 
-# Paso 11: Ejecutar migraciones de Prisma
+# Paso 12: Ejecutar migraciones de Prisma
 log_info "Ejecutando migraciones de Prisma..."
 ssh -i $PROD_EC2_KEY $EC2_USER@$EC2_HOST << EOF
   set -e
   cd $EC2_DEPLOY_PATH
+  export DATABASE_URL="$PROD_DATABASE_URL"
   npx prisma migrate deploy
 EOF
 log_success "Migraciones aplicadas"
 
-# Paso 12: Restart del servicio
+# Paso 13: Restart del servicio
 log_info "Reiniciando servicio..."
 ssh -i $PROD_EC2_KEY $EC2_USER@$EC2_HOST << EOF
   set -e
@@ -190,7 +214,7 @@ ssh -i $PROD_EC2_KEY $EC2_USER@$EC2_HOST << EOF
 EOF
 log_success "Servicio reiniciado y verificado"
 
-# Paso 13: Verificar deploy
+# Paso 14: Verificar deploy
 log_info "Verificando deploy..."
 HEALTH_CHECK=$(curl -s http://$EC2_HOST:3000/api/health | grep -o "ok" || echo "error")
 if [ "$HEALTH_CHECK" = "ok" ]; then
@@ -201,7 +225,7 @@ else
   exit 1
 fi
 
-# Paso 14: Notificación
+# Paso 15: Notificación
 log_info "Deploy completado exitosamente"
 echo ""
 echo -e "${GREEN}════════════════════════════════════════${NC}"
