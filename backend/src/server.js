@@ -121,3 +121,4 @@ process.on('SIGTERM', () => {
 })
 
 export default app
+// API Version 1.0.0
