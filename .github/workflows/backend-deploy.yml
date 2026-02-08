@@ -45,11 +45,27 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           echo "SSH key created"
 
-          # Try to add host key, continue if it fails
-          ssh-keyscan -t rsa -T 10 -H $EC2_HOST >> ~/.ssh/known_hosts 2>/dev/null || echo "Warning: ssh-keyscan failed, continuing..."
+          # Create SSH config for better reliability
+          cat > ~/.ssh/config << 'EOF'
+Host ec2-host
+  HostName $EC2_HOST
+  User $EC2_USER
+  IdentityFile ~/.ssh/id_rsa
+  StrictHostKeyChecking accept-new
+  UserKnownHostsFile ~/.ssh/known_hosts
+  ConnectTimeout 30
+  ServerAliveInterval 60
+  ServerAliveCountMax 5
+EOF
+
+          echo "SSH config created"
+
+          # Try to add host key with longer timeout
+          ssh-keyscan -T 20 $EC2_HOST >> ~/.ssh/known_hosts 2>/dev/null || echo "Warning: ssh-keyscan failed, continuing..."
           echo "SSH known_hosts updated"
 
-          ssh -o StrictHostKeyChecking=accept-new -v $EC2_USER@$EC2_HOST << 'ENDSSH'
+          # Deploy with improved SSH connection
+          ssh -F ~/.ssh/config ec2-host << 'ENDSSH'
           set -x
           cd /opt/innovaciones-logistica
           echo "Pulling latest code..."
