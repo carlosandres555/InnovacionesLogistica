@@ -47,13 +47,14 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
               "set -e",
+              "export HOME=/home/ubuntu",
               "export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH",
               "git config --global --add safe.directory /opt/innovaciones-logistica",
               "cd /opt/innovaciones-logistica",
               "echo \"Step 1: Discarding local changes...\"",
               "git checkout -- . 2>/dev/null || true",
               "echo \"Step 2: Pulling latest code (timeout 5m)...\"",
-              "timeout 300 bash -c '\''GIT_SSH_COMMAND=\"ssh -i ~/.ssh/github_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no\" git pull origin main'\''",
+              "timeout 300 bash -c '\''GIT_SSH_COMMAND=\"ssh -i /home/ubuntu/.ssh/github_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no\" git pull origin main'\''",
               "echo \"Step 3: Installing backend deps (timeout 10m)...\"",
               "cd backend && timeout 600 npm install",
               "echo \"Step 4: Generating Prisma...\"",
