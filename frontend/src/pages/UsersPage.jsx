@@ -99,108 +99,116 @@ export default function UsersPage() {
   const isLoading_ = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Gestión de Usuarios</h1>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-400 via-red-300 to-orange-300 bg-clip-text text-transparent mb-1">
+            Gestión de Usuarios
+          </h1>
+          <p className="text-red-200/70 text-sm">Administra los usuarios del sistema</p>
+        </div>
         <button
           onClick={handleCreateClick}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-sm sm:text-base"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl transition-all duration-300 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-red-900/50"
         >
           <Plus className="w-5 h-5" />
           Crear Usuario
         </button>
       </div>
 
-      {/* Search */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-4 sm:p-6 border-b border-gray-200">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar por nombre, apellido o email..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                setPage(1)
-              }}
-              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      {/* Search Card */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-900/30 to-red-950/30 border border-red-700/30 p-6 backdrop-blur-sm">
+        <div className="absolute -right-20 -top-20 w-40 h-40 bg-gradient-to-br from-red-600/10 to-transparent rounded-full blur-3xl"></div>
+        <div className="relative">
+          <Search className="absolute left-4 top-4 w-5 h-5 text-red-400/60" />
+          <input
+            type="text"
+            placeholder="Buscar por nombre, apellido o email..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            className="w-full pl-12 pr-4 py-3 text-sm bg-slate-800/50 border border-red-700/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition text-white placeholder-red-300/50"
+          />
         </div>
+      </div>
 
-        {/* Error */}
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 m-4">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-            <p className="text-red-700 text-sm">
-              {error.message || 'Error al cargar usuarios'}
-            </p>
-          </div>
-        )}
+      {/* Error */}
+      {error && (
+        <div className="p-4 bg-red-950/40 border border-red-700/50 rounded-xl flex items-center gap-3 backdrop-blur-sm">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+          <p className="text-red-300 text-sm">
+            {error.message || 'Error al cargar usuarios'}
+          </p>
+        </div>
+      )}
 
+      {/* Table Container */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-900/20 to-red-950/20 border border-red-700/30 backdrop-blur-sm">
         {/* Table */}
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500 text-sm">
-            Cargando usuarios...
+          <div className="p-12 text-center text-red-200/70 text-sm">
+            <div className="inline-block w-8 h-8 border-3 border-red-400/30 border-t-red-400 rounded-full animate-spin mb-4"></div>
+            <p>Cargando usuarios...</p>
           </div>
         ) : data?.users?.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 text-sm">
-            No hay usuarios para mostrar
+          <div className="p-12 text-center text-red-200/70 text-sm">
+            <p>No hay usuarios para mostrar</p>
           </div>
         ) : (
           <>
             {/* Desktop Table */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-red-900/50 to-red-950/50 border-b border-red-700/30">
                   <tr>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
                       Usuario
                     </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
                       Email
                     </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
                       Teléfono
                     </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
                       Rol
                     </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
                       Estado
                     </th>
-                    <th className="px-4 sm:px-6 py-3 text-right text-xs sm:text-sm font-semibold text-gray-900">
+                    <th className="px-4 sm:px-6 py-4 text-right text-xs sm:text-sm font-semibold text-red-300">
                       Acciones
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-red-700/20">
                   {data?.users?.map(user => (
                     <tr
                       key={user.id}
-                      className="border-b border-gray-200 hover:bg-gray-50 transition"
+                      className="hover:bg-red-700/10 transition-colors duration-200"
                     >
                       <td className="px-4 sm:px-6 py-4">
                         <div>
-                          <p className="font-medium text-gray-900 text-sm">
+                          <p className="font-medium text-white text-sm">
                             {user.firstName} {user.lastName}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-red-300/60">
                             ID: {user.id.substring(0, 8)}
                           </p>
                         </div>
                       </td>
-                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-600">
+                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-red-200/80">
                         {user.email}
                       </td>
-                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-600">
+                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-red-200/80">
                         {user.phone || '-'}
                       </td>
                       <td className="px-4 sm:px-6 py-4">
                         <span
-                          className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(
                             user.role
                           )}`}
                         >
@@ -209,10 +217,10 @@ export default function UsersPage() {
                       </td>
                       <td className="px-4 sm:px-6 py-4">
                         <span
-                          className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
                             user.isActive
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                              ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                              : 'bg-red-500/20 text-red-300 border border-red-500/30'
                           }`}
                         >
                           {user.isActive ? 'Activo' : 'Inactivo'}
@@ -223,7 +231,7 @@ export default function UsersPage() {
                           <button
                             onClick={() => handleEditClick(user)}
                             disabled={isLoading_}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded transition disabled:opacity-50"
+                            className="p-2 text-blue-400 hover:bg-blue-600/30 rounded-lg transition disabled:opacity-50"
                             title="Editar"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -231,7 +239,7 @@ export default function UsersPage() {
                           <button
                             onClick={() => setShowPasswordReset(user)}
                             disabled={isLoading_}
-                            className="p-2 text-orange-600 hover:bg-orange-50 rounded transition disabled:opacity-50"
+                            className="p-2 text-yellow-400 hover:bg-yellow-600/30 rounded-lg transition disabled:opacity-50"
                             title="Restablecer contraseña"
                           >
                             <Key className="w-4 h-4" />
@@ -239,7 +247,7 @@ export default function UsersPage() {
                           <button
                             onClick={() => setShowDeleteConfirm(user)}
                             disabled={isLoading_}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded transition disabled:opacity-50"
+                            className="p-2 text-red-400 hover:bg-red-600/30 rounded-lg transition disabled:opacity-50"
                             title="Desactivar"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -257,14 +265,14 @@ export default function UsersPage() {
               {data?.users?.map(user => (
                 <div
                   key={user.id}
-                  className="border border-gray-200 rounded-lg p-4 space-y-3"
+                  className="border border-red-700/30 rounded-xl p-4 space-y-3 bg-red-900/10 hover:bg-red-900/20 transition-colors duration-200"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <p className="font-medium text-gray-900 text-sm">
+                      <p className="font-medium text-white text-sm">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-red-300/60">
                         ID: {user.id.substring(0, 8)}
                       </p>
                     </div>
@@ -272,7 +280,7 @@ export default function UsersPage() {
                       <button
                         onClick={() => handleEditClick(user)}
                         disabled={isLoading_}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded transition disabled:opacity-50"
+                        className="p-2 text-blue-400 hover:bg-blue-600/30 rounded-lg transition disabled:opacity-50"
                         title="Editar"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -280,7 +288,7 @@ export default function UsersPage() {
                       <button
                         onClick={() => setShowPasswordReset(user)}
                         disabled={isLoading_}
-                        className="p-2 text-orange-600 hover:bg-orange-50 rounded transition disabled:opacity-50"
+                        className="p-2 text-yellow-400 hover:bg-yellow-600/30 rounded-lg transition disabled:opacity-50"
                         title="Restablecer contraseña"
                       >
                         <Key className="w-4 h-4" />
@@ -288,7 +296,7 @@ export default function UsersPage() {
                       <button
                         onClick={() => setShowDeleteConfirm(user)}
                         disabled={isLoading_}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded transition disabled:opacity-50"
+                        className="p-2 text-red-400 hover:bg-red-600/30 rounded-lg transition disabled:opacity-50"
                         title="Desactivar"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -298,12 +306,12 @@ export default function UsersPage() {
 
                   <div className="space-y-2 text-xs sm:text-sm">
                     <div>
-                      <span className="text-gray-600">Email: </span>
-                      <span className="text-gray-900">{user.email}</span>
+                      <span className="text-red-300/60">Email: </span>
+                      <span className="text-red-200/80">{user.email}</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">Teléfono: </span>
-                      <span className="text-gray-900">{user.phone || '-'}</span>
+                      <span className="text-red-300/60">Teléfono: </span>
+                      <span className="text-red-200/80">{user.phone || '-'}</span>
                     </div>
                     <div className="flex gap-2">
                       <span
@@ -316,8 +324,8 @@ export default function UsersPage() {
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           user.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                            : 'bg-red-500/20 text-red-300 border border-red-500/30'
                         }`}
                       >
                         {user.isActive ? 'Activo' : 'Inactivo'}
@@ -332,8 +340,8 @@ export default function UsersPage() {
 
         {/* Pagination */}
         {data?.pagination && data.pagination.pages > 1 && (
-          <div className="px-4 sm:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <p className="text-xs sm:text-sm text-gray-600">
+          <div className="px-4 sm:px-6 py-4 border-t border-red-700/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-red-900/20 to-transparent">
+            <p className="text-xs sm:text-sm text-red-200/70">
               Página {data.pagination.page} de {data.pagination.pages} (
               {data.pagination.total} usuarios)
             </p>
@@ -341,14 +349,14 @@ export default function UsersPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition"
+                className="px-4 py-2 text-sm border border-red-700/30 bg-red-900/20 hover:bg-red-900/40 text-red-300 rounded-lg disabled:opacity-50 transition"
               >
                 Anterior
               </button>
               <button
                 onClick={() => setPage(p => Math.min(data.pagination.pages, p + 1))}
                 disabled={page === data.pagination.pages}
-                className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition"
+                className="px-4 py-2 text-sm border border-red-700/30 bg-red-900/20 hover:bg-red-900/40 text-red-300 rounded-lg disabled:opacity-50 transition"
               >
                 Siguiente
               </button>

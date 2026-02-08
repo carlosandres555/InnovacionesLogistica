@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, X, LogOut, Home, Users } from 'lucide-react'
+import { Menu, X, LogOut, Home, Users, Zap } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
 export default function Layout({ children }) {
@@ -21,19 +21,28 @@ export default function Layout({ children }) {
   ]
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Sidebar - Fixed on mobile, relative on desktop */}
       <aside
         className={`${
           sidebarOpen ? 'block' : 'hidden'
-        } fixed inset-y-0 left-0 z-50 w-64 bg-blue-900 text-white overflow-y-auto lg:relative lg:block transition-all duration-300`}
+        } fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-red-900 via-red-800 to-red-950 text-white overflow-y-auto lg:relative lg:block transition-all duration-300 shadow-2xl`}
       >
-        <div className="p-4 sm:p-6">
-          <h1 className="text-xl sm:text-2xl font-bold">Innovaciones</h1>
-          <p className="text-xs sm:text-sm text-blue-200">Logística</p>
+        {/* Logo Section */}
+        <div className="p-6 border-b border-red-700/30">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-red-400 to-red-600">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">
+              Innovaciones
+            </h1>
+          </div>
+          <p className="text-xs text-red-200/70">Logística Moderna</p>
         </div>
 
-        <nav className="mt-6 sm:mt-8">
+        {/* Navigation */}
+        <nav className="mt-8 space-y-2 px-3">
           {menuItems.map(item => {
             const Icon = item.icon
             return (
@@ -41,21 +50,22 @@ export default function Layout({ children }) {
                 key={item.href}
                 to={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center px-4 sm:px-6 py-3 text-gray-100 hover:bg-blue-800 transition text-sm sm:text-base"
+                className="flex items-center px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/50 hover:text-white transition-all duration-200 text-sm sm:text-base group"
               >
-                <Icon className="w-5 h-5 mr-3 flex-shrink-0" />
-                <span>{item.label}</span>
+                <Icon className="w-5 h-5 mr-3 flex-shrink-0 group-hover:text-red-300" />
+                <span className="font-medium">{item.label}</span>
               </Link>
             )
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 border-t border-blue-800">
+        {/* Bottom Section */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-red-700/30 bg-gradient-to-t from-red-950 to-transparent">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full text-gray-100 hover:text-white transition text-sm sm:text-base"
+            className="flex items-center w-full px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/50 hover:text-white transition-all duration-200 text-sm font-medium group"
           >
-            <LogOut className="w-5 h-5 mr-3 flex-shrink-0" />
+            <LogOut className="w-5 h-5 mr-3 flex-shrink-0 group-hover:text-red-300" />
             <span>Salir</span>
           </button>
         </div>
@@ -64,35 +74,38 @@ export default function Layout({ children }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile/Tablet header */}
-        <div className="lg:hidden bg-white shadow">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+        <div className="lg:hidden bg-gradient-to-r from-red-900 to-red-800 shadow-lg border-b border-red-700/30">
+          <div className="px-4 sm:px-6 py-4 flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition lg:hidden"
+              className="text-red-100 p-2 hover:bg-red-700/50 rounded-lg transition-all lg:hidden"
               aria-label="Toggle menu"
             >
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
-            <div className="text-xs sm:text-sm text-gray-600 text-center flex-1">
+            <div className="text-sm text-red-100 text-center flex-1 font-medium">
               <span className="block sm:inline">{user?.firstName}</span>
-              <span className="hidden sm:inline sm:ml-2">{user?.lastName}</span>
+              <span className="hidden sm:inline sm:ml-2 text-red-200/70">{user?.lastName}</span>
             </div>
           </div>
         </div>
 
         {/* Desktop header */}
-        <div className="hidden lg:block bg-white shadow">
-          <div className="px-6 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-800">
-              {user?.company?.name || 'Mi Cuenta'}
+        <div className="hidden lg:block bg-gradient-to-r from-slate-900 to-slate-800 border-b border-red-700/20 shadow-lg">
+          <div className="px-6 py-5 flex items-center justify-between">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">
+              {user?.company?.name || 'Panel de Control'}
             </h2>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                {user?.firstName} {user?.lastName}
-              </span>
+            <div className="flex items-center gap-6">
+              <div>
+                <p className="text-sm font-medium text-red-200">
+                  {user?.firstName} {user?.lastName}
+                </p>
+                <p className="text-xs text-red-300/60 capitalize">{user?.role}</p>
+              </div>
               <button
                 onClick={handleLogout}
-                className="text-gray-600 hover:text-gray-900 transition"
+                className="p-2.5 text-red-200 hover:text-red-100 hover:bg-red-700/30 rounded-lg transition-all duration-200"
                 title="Salir"
               >
                 <LogOut className="w-5 h-5" />
@@ -102,15 +115,17 @@ export default function Layout({ children }) {
         </div>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6">
-          {children}
+        <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-8">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

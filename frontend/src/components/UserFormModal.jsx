@@ -94,16 +94,16 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex items-center justify-between">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-red-700/30">
+        <div className="sticky top-0 bg-gradient-to-r from-red-900/50 to-red-950/50 border-b border-red-700/30 p-4 sm:p-6 flex items-center justify-between backdrop-blur-sm">
+          <h3 className="text-base sm:text-lg font-semibold text-red-100">
             {isEditing ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
           </h3>
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-1"
+            className="text-red-300 hover:text-red-200 hover:bg-red-700/30 rounded-lg p-1 transition disabled:opacity-50"
             aria-label="Cerrar"
           >
             <X className="w-6 h-6" />
@@ -114,65 +114,65 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
           {/* Name Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+              <label className="block text-sm font-medium text-red-200 mb-2">Nombre</label>
               <input
                 type="text"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 ${
-                  errors.firstName ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-3 text-sm bg-slate-800/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-white placeholder-red-300/50 transition ${
+                  errors.firstName ? 'border-red-500/50' : 'border-red-700/30'
                 }`}
                 placeholder="Juan"
               />
               {errors.firstName && (
-                <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.firstName}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+              <label className="block text-sm font-medium text-red-200 mb-2">Apellido</label>
               <input
                 type="text"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 ${
-                  errors.lastName ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-3 text-sm bg-slate-800/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-white placeholder-red-300/50 transition ${
+                  errors.lastName ? 'border-red-500/50' : 'border-red-700/30'
                 }`}
                 placeholder="Pérez"
               />
               {errors.lastName && (
-                <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.lastName}</p>
               )}
             </div>
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="block text-sm font-medium text-red-200 mb-2">Email</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               disabled={isLoading || isEditing}
-              className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-3 text-sm bg-slate-800/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-white placeholder-red-300/50 transition ${
+                errors.email ? 'border-red-500/50' : 'border-red-700/30'
               }`}
               placeholder="juan@example.com"
             />
             {errors.email && (
-              <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+              <p className="text-sm text-red-400 mt-1">{errors.email}</p>
             )}
           </div>
 
           {/* Password - Only for new users */}
           {!isEditing && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-red-200 mb-2">
                 Contraseña
               </label>
               <input
@@ -181,20 +181,20 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
                 value={formData.password}
                 onChange={handleChange}
                 disabled={isLoading}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-3 text-sm bg-slate-800/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-white placeholder-red-300/50 transition ${
+                  errors.password ? 'border-red-500/50' : 'border-red-700/30'
                 }`}
                 placeholder="Mínimo 6 caracteres"
               />
               {errors.password && (
-                <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.password}</p>
               )}
             </div>
           )}
 
           {/* Phone */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-red-200 mb-2">
               Teléfono (opcional)
             </label>
             <input
@@ -203,20 +203,20 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
               value={formData.phone}
               onChange={handleChange}
               disabled={isLoading}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+              className="w-full px-4 py-3 text-sm bg-slate-800/50 border border-red-700/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-white placeholder-red-300/50 transition"
               placeholder="+57 3001234567"
             />
           </div>
 
           {/* Role */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+            <label className="block text-sm font-medium text-red-200 mb-2">Rol</label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
               disabled={isLoading}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+              className="w-full px-4 py-3 text-sm bg-slate-800/50 border border-red-700/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-white transition"
             >
               {ROLES.map(role => (
                 <option key={role} value={role}>
@@ -228,7 +228,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
 
           {/* Modules */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-red-200 mb-3">
               Módulos Permitidos
             </label>
             <div className="space-y-2">
@@ -239,31 +239,31 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
                     checked={formData.permissions.modules.includes(module)}
                     onChange={() => handleModuleToggle(module)}
                     disabled={isLoading}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    className="w-4 h-4 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 accent-red-600"
                   />
-                  <span className="ml-3 text-sm text-gray-700 capitalize">{module}</span>
+                  <span className="ml-3 text-sm text-red-200/80 capitalize">{module}</span>
                 </label>
               ))}
             </div>
             {errors.modules && (
-              <p className="text-sm text-red-500 mt-2">{errors.modules}</p>
+              <p className="text-sm text-red-400 mt-2">{errors.modules}</p>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 sm:pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 sm:pt-6 border-t border-red-700/20">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition disabled:opacity-50 order-2 sm:order-1"
+              className="px-4 py-3 text-sm text-red-300 bg-red-900/20 border border-red-700/30 hover:bg-red-900/40 rounded-xl transition disabled:opacity-50 order-2 sm:order-1 font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 order-1 sm:order-2"
+              className="px-4 py-3 text-sm bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl transition disabled:opacity-50 order-1 sm:order-2 font-medium shadow-lg hover:shadow-xl hover:shadow-red-900/50"
             >
               {isLoading ? 'Guardando...' : isEditing ? 'Actualizar' : 'Crear Usuario'}
             </button>
