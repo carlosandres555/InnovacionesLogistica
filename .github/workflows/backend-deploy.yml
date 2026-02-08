@@ -34,29 +34,35 @@ jobs:
         continue-on-error: true
 
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          timeout: 60s
-          command_timeout: 10m
-          script: |
-            set -x
-            cd /opt/innovaciones-logistica
-            echo "Pulling latest code..."
-            git pull origin main || echo "Git pull failed"
-            cd backend
-            echo "Installing dependencies..."
-            npm install
-            echo "Generating Prisma..."
-            npx prisma generate
-            echo "Pushing database..."
-            npx prisma db push --skip-generate
-            echo "Restarting PM2..."
-            pm2 restart innovaciones-api
-            echo "Deployment completed"
-            pm2 logs innovaciones-api --lines 20
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_KEY: ${{ secrets.EC2_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$EC2_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # Use aggressive SSH options to bypass connectivity issues
+          ssh -o BatchMode=yes \
+              -o ConnectTimeout=60 \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              -o ServerAliveInterval=10 \
+              -o ServerAliveCountMax=10 \
+              -o ProxyUseFdpass=no \
+              $EC2_USER@$EC2_HOST 'bash -s' << 'ENDSSH'
+          set -x
+          cd /opt/innovaciones-logistica
+          git pull origin main || echo "Git pull failed"
+          cd backend
+          npm install
+          npx prisma generate
+          npx prisma db push --skip-generate
+          pm2 restart innovaciones-api
+          sleep 2
+          pm2 logs innovaciones-api --lines 20
+          ENDSSH
 
       # - name: Notify Slack on failure
       #   if: failure()
