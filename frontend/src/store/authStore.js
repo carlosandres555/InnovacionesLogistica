@@ -90,16 +90,6 @@ export const useAuthStore = create(
         }
       },
 
-      getMe: async () => {
-        try {
-          const { data } = await axios.get(`${API_URL}/auth/me`)
-          set({ user: data })
-          return data
-        } catch (error) {
-          throw error
-        }
-      },
-
       initializeAuth: () => {
         const state = get()
         if (state.accessToken) {

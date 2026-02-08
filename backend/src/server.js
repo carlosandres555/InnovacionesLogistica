@@ -1,10 +1,7 @@
-// Test deploy - 2026-02-08 - AWS SSM with proper IAM permissions ✅
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { Server } from 'socket.io'
-import http from 'http'
 import dotenv from 'dotenv'
 import rateLimit from 'express-rate-limit'
 
@@ -13,11 +10,6 @@ dotenv.config()
 
 // Import routes
 import authRoutes from './routes/auth.js'
-import shipmentsRoutes from './routes/shipments.js'
-import companiesRoutes from './routes/companies.js'
-import vehiclesRoutes from './routes/vehicles.js'
-import locationsRoutes from './routes/locations.js'
-import uploadsRoutes from './routes/uploads.js'
 import usersRoutes from './routes/users.js'
 
 // Import middleware
@@ -26,16 +18,6 @@ import { errorHandler } from './middleware/errorHandler.js'
 
 // Initialize Express app
 const app = express()
-const server = http.createServer(app)
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST']
-  }
-})
-
-// Store io instance globally for use in routes
-app.set('io', io)
 
 // Middleware
 app.use(helmet())
@@ -63,11 +45,6 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes)
 
 // Protected routes (require authentication)
-app.use('/api/shipments', authenticateToken, shipmentsRoutes)
-app.use('/api/companies', authenticateToken, companiesRoutes)
-app.use('/api/vehicles', authenticateToken, vehiclesRoutes)
-app.use('/api/locations', authenticateToken, locationsRoutes)
-app.use('/api/uploads', authenticateToken, uploadsRoutes)
 app.use('/api/users', authenticateToken, usersRoutes)
 
 // 404 handler
@@ -78,33 +55,9 @@ app.use((req, res) => {
 // Error handler middleware
 app.use(errorHandler)
 
-// WebSocket events
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id)
-
-  socket.on('join-shipment', (shipmentId) => {
-    socket.join(`shipment-${shipmentId}`)
-    console.log(`User joined shipment: ${shipmentId}`)
-  })
-
-  socket.on('leave-shipment', (shipmentId) => {
-    socket.leave(`shipment-${shipmentId}`)
-    console.log(`User left shipment: ${shipmentId}`)
-  })
-
-  socket.on('location-update', (data) => {
-    // Broadcast to shipment room
-    io.to(`shipment-${data.shipmentId}`).emit('location-update', data)
-  })
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id)
-  })
-})
-
 // Start server
 const PORT = process.env.PORT || 3000
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║     Innovaciones Logistica API Server                  ║
@@ -117,10 +70,7 @@ server.listen(PORT, () => {
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully')
-  server.close(() => {
-    console.log('Server closed')
-    process.exit(0)
-  })
+  process.exit(0)
 })
 
 export default app

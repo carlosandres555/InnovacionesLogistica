@@ -180,39 +180,6 @@ router.post('/refresh', async (req, res, next) => {
   }
 })
 
-// Get current user
-router.get('/me', authenticateToken, async (req, res, next) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        role: true,
-        permissions: true,
-        company: {
-          select: {
-            id: true,
-            name: true,
-            logo: true
-          }
-        }
-      }
-    })
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    res.json(user)
-  } catch (error) {
-    next(error)
-  }
-})
-
 // Logout (client-side token deletion, but useful for audit)
 router.post('/logout', authenticateToken, async (req, res) => {
   res.json({ message: 'Logged out successfully' })

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 
-const MODULES = ['dashboard', 'users', 'shipments', 'companies', 'vehicles', 'locations']
+const MODULES = ['dashboard', 'users']
 const ROLES = ['CUSTOMER', 'IN_HOUSE', 'ANALISTA', 'ADMIN']
 
 export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, initialData }) {
