@@ -71,10 +71,10 @@ jobs:
             --query 'Command.CommandId')
 
           echo "✅ Command sent (ID: $COMMAND_ID)"
-          echo "⏳ Waiting for command completion (max 30 minutes)..."
+          echo "⏳ Waiting for command completion (max 60 minutes)..."
 
-          # Wait for command to complete with timeout (max 30 minutes)
-          TIMEOUT=360
+          # Wait for command to complete with timeout (max 60 minutes)
+          TIMEOUT=720
           ELAPSED=0
 
           while [ $ELAPSED -lt $TIMEOUT ]; do
@@ -104,7 +104,7 @@ jobs:
             ELAPSED=$((ELAPSED + 10))
           done
 
-          echo "❌ Deployment timeout (>30 minutes)"
+          echo "❌ Deployment timeout (>60 minutes)"
           exit 1
 
       # - name: Notify Slack on failure
