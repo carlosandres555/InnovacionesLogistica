@@ -17,123 +17,158 @@ export default function ShipmentDetailPage() {
   })
 
   if (isLoading) {
-    return <div className="text-center py-12">Cargando...</div>
+    return (
+      <div className="text-center py-12 text-gray-500 text-sm sm:text-base">
+        Cargando...
+      </div>
+    )
   }
 
   if (!shipment) {
-    return <div className="text-center py-12 text-red-600">Envío no encontrado</div>
+    return (
+      <div className="text-center py-12 text-red-600 text-sm sm:text-base">
+        Envío no encontrado
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">{shipment.trackingNumber}</h1>
-        <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-          shipment.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-          shipment.status === 'IN_TRANSIT' ? 'bg-blue-100 text-blue-800' :
-          'bg-yellow-100 text-yellow-800'
-        }`}>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-all">
+          {shipment.trackingNumber}
+        </h1>
+        <span
+          className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap ${
+            shipment.status === 'DELIVERED'
+              ? 'bg-green-100 text-green-800'
+              : shipment.status === 'IN_TRANSIT'
+              ? 'bg-blue-100 text-blue-800'
+              : 'bg-yellow-100 text-yellow-800'
+          }`}
+        >
           {shipment.status}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Información de envío */}
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Información del Envío</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
+            Información del Envío
+          </h2>
 
           <div>
-            <p className="text-sm text-gray-600">Descripción</p>
-            <p className="text-gray-900">{shipment.description}</p>
+            <p className="text-xs sm:text-sm text-gray-600">Descripción</p>
+            <p className="text-sm sm:text-base text-gray-900">{shipment.description}</p>
           </div>
 
           <div>
-            <p className="text-sm text-gray-600">Peso</p>
-            <p className="text-gray-900">{shipment.weight} kg</p>
+            <p className="text-xs sm:text-sm text-gray-600">Peso</p>
+            <p className="text-sm sm:text-base text-gray-900">{shipment.weight} kg</p>
           </div>
 
           {shipment.dimensions && (
             <div>
-              <p className="text-sm text-gray-600">Dimensiones</p>
-              <p className="text-gray-900">{shipment.dimensions}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Dimensiones</p>
+              <p className="text-sm sm:text-base text-gray-900">
+                {shipment.dimensions}
+              </p>
             </div>
           )}
 
           {shipment.value && (
             <div>
-              <p className="text-sm text-gray-600">Valor</p>
-              <p className="text-gray-900">${shipment.value}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Valor</p>
+              <p className="text-sm sm:text-base text-gray-900">${shipment.value}</p>
             </div>
           )}
         </div>
 
         {/* Ubicación */}
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Ubicación</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
+            Ubicación
+          </h2>
 
           <div className="flex gap-3">
-            <MapPin className="w-5 h-5 text-green-600 flex-shrink-0" />
-            <div>
-              <p className="text-sm text-gray-600">Origen</p>
-              <p className="text-gray-900">{shipment.originAddress}</p>
+            <MapPin className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm text-gray-600">Origen</p>
+              <p className="text-sm sm:text-base text-gray-900 break-words">
+                {shipment.originAddress}
+              </p>
             </div>
           </div>
 
           <div className="flex gap-3">
-            <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0" />
-            <div>
-              <p className="text-sm text-gray-600">Destino</p>
-              <p className="text-gray-900">{shipment.destAddress}</p>
+            <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm text-gray-600">Destino</p>
+              <p className="text-sm sm:text-base text-gray-900 break-words">
+                {shipment.destAddress}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Asignación y cronograma */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Asignación</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
+            Asignación
+          </h2>
 
           {shipment.assignedDriver && (
             <div>
-              <p className="text-sm text-gray-600">Conductor</p>
-              <p className="text-gray-900">
-                {shipment.assignedDriver.firstName} {shipment.assignedDriver.lastName}
+              <p className="text-xs sm:text-sm text-gray-600">Conductor</p>
+              <p className="text-sm sm:text-base text-gray-900">
+                {shipment.assignedDriver.firstName}{' '}
+                {shipment.assignedDriver.lastName}
               </p>
             </div>
           )}
 
           {shipment.vehicle && (
             <div>
-              <p className="text-sm text-gray-600">Vehículo</p>
-              <p className="text-gray-900">{shipment.vehicle.plate}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Vehículo</p>
+              <p className="text-sm sm:text-base text-gray-900">
+                {shipment.vehicle.plate}
+              </p>
             </div>
           )}
 
           {!shipment.assignedDriver && (
-            <p className="text-gray-500 text-sm">No asignado aún</p>
+            <p className="text-gray-500 text-xs sm:text-sm">No asignado aún</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Cronograma</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
+            Cronograma
+          </h2>
 
           {shipment.scheduledDate && (
             <div className="flex gap-3">
-              <Calendar className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <Calendar className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-600">Fecha Programada</p>
-                <p className="text-gray-900">{new Date(shipment.scheduledDate).toLocaleDateString()}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Fecha Programada</p>
+                <p className="text-sm sm:text-base text-gray-900">
+                  {new Date(shipment.scheduledDate).toLocaleDateString()}
+                </p>
               </div>
             </div>
           )}
 
           {shipment.deliveryTime && (
             <div className="flex gap-3">
-              <Calendar className="w-5 h-5 text-green-600 flex-shrink-0" />
+              <Calendar className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-600">Entregado</p>
-                <p className="text-gray-900">{new Date(shipment.deliveryTime).toLocaleString()}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Entregado</p>
+                <p className="text-sm sm:text-base text-gray-900">
+                  {new Date(shipment.deliveryTime).toLocaleString()}
+                </p>
               </div>
             </div>
           )}
@@ -142,16 +177,24 @@ export default function ShipmentDetailPage() {
 
       {/* Historial de ubicación */}
       {shipment.locations && shipment.locations.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Historial de Ubicación</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
+            Historial de Ubicación
+          </h2>
 
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {shipment.locations.map((location, idx) => (
-              <div key={location.id} className="flex gap-4 pb-3 border-b border-gray-200 last:border-0">
-                <div className="text-2xl">{idx + 1}</div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    {location.address || `${location.latitude}, ${location.longitude}`}
+              <div
+                key={location.id}
+                className="flex gap-3 sm:gap-4 pb-3 border-b border-gray-200 last:border-0"
+              >
+                <div className="text-lg sm:text-2xl font-semibold text-gray-400 flex-shrink-0">
+                  {idx + 1}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-gray-900 break-words">
+                    {location.address ||
+                      `${location.latitude}, ${location.longitude}`}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     {new Date(location.timestamp).toLocaleString()}

@@ -33,11 +33,11 @@ export default function MapPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-3xl font-bold text-gray-900">Mapa de Envíos</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mapa de Envíos</h1>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: '600px' }}>
+      <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: 'calc(100vh - 250px)', minHeight: '300px', maxHeight: '600px' }}>
         {isLoading ? (
-          <div className="w-full h-full flex items-center justify-center text-gray-500">
+          <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm sm:text-base">
             Cargando mapa...
           </div>
         ) : (
@@ -54,11 +54,12 @@ export default function MapPage() {
                 icon={defaultIcon}
               >
                 <Popup>
-                  <div className="w-48">
+                  <div className="w-48 sm:w-56">
                     <p className="font-bold text-sm">{shipment.trackingNumber}</p>
-                    <p className="text-xs text-gray-600">{shipment.destAddress}</p>
+                    <p className="text-xs text-gray-600 mt-1">{shipment.destAddress}</p>
                     <p className="text-xs mt-2">
-                      <span className="font-semibold">Estado:</span> {shipment.status}
+                      <span className="font-semibold">Estado:</span>{' '}
+                      {shipment.status}
                     </p>
                   </div>
                 </Popup>
@@ -69,7 +70,7 @@ export default function MapPage() {
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-800">
+        <p className="text-xs sm:text-sm text-blue-800">
           {shipments?.length || 0} envíos mostrados en el mapa
         </p>
       </div>
