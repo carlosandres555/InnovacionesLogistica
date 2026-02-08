@@ -40,13 +40,13 @@ jobs:
           EC2_KEY: ${{ secrets.EC2_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "$EC2_KEY" > ~/.ssh/id_rsa
+          printf '%s\n' "$EC2_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
 
           ssh $EC2_USER@$EC2_HOST << 'ENDSSH'
           cd /opt/innovaciones-logistica
-          git pull origin master
+          git pull origin main
           cd backend
           npm install
           npx prisma generate
