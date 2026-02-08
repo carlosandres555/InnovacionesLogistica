@@ -20,21 +20,7 @@
 
 Para que el **deploy automático funcione**, necesitas hacer ESTO una sola vez:
 
-### Paso 1: Copiar archivos actualizados a tu máquina
-
-```bash
-cd /Users/carlosrodriguez/Project/DistribucionCosta
-
-# Asegúrate de estar en rama main
-git status
-
-# Push al repositorio si hay cambios locales
-git add .
-git commit -m "docs: final documentation and GitHub Actions setup"
-git push origin main
-```
-
-### Paso 2: Agregar GitHub Secrets (IMPORTANTE)
+### Paso 1: Agregar GitHub Secrets (IMPORTANTE)
 
 1. Ve a: **GitHub.com → tu repo**
 2. **Settings → Secrets and variables → Actions**
@@ -58,18 +44,19 @@ cat ~/.ssh/innovaciones-logistica-key.pem
 
 (Incluye desde `-----BEGIN OPENSSH PRIVATE KEY-----` hasta `-----END OPENSSH PRIVATE KEY-----`)
 
-### Paso 3: Crear rama "master"
+### Paso 2: Push a main
 
-GitHub Actions está configurado para deployar cuando hagas push a **master**.
+GitHub Actions está configurado para deployar cuando hagas push a **main**.
 
 ```bash
-# Si todavía no existe
-git branch master main
-git push -u origin master
+# Asegúrate de estar en main
+git checkout main
+git pull origin main
 
-# O simplemente renombra main a master
-git branch -m main master
-git push -u origin master
+# Si hiciste cambios locales
+git add .
+git commit -m "docs: setup complete"
+git push origin main
 ```
 
 ---
@@ -106,9 +93,9 @@ git checkout develop
 git merge feature/nombre-descriptivo
 
 # 8. Cuando lista para producción
-git checkout master
+git checkout main
 git merge develop
-git push origin master
+git push origin main
 
 # ← GitHub Actions automáticamente deploya aquí ✅
 ```
@@ -117,7 +104,7 @@ git push origin master
 
 ## 📊 Qué pasa automáticamente
 
-### Cuando haces `git push origin master`:
+### Cuando haces `git push origin main`:
 
 ```
 GitHub detecta cambios en master
@@ -145,7 +132,7 @@ en EC2 en ~3 minutos            en S3 en ~3 minutos
 
 ## ✨ Características del Setup
 
-✅ **Auto-deploy en master:**
+✅ **Auto-deploy en main:**
 - Backend actualizado en EC2
 - Frontend actualizado en S3 + CloudFront
 - Invalida caché automáticamente
@@ -219,10 +206,9 @@ Todos los documentos están en `/docs`:
 ## 📞 Próximos Pasos
 
 1. **Agregar secrets a GitHub** (arriba)
-2. **Crear rama master** (si no existe)
-3. **Hacer primer push a master** (prueba el auto-deploy)
-4. **Trabajar en develop** (features nuevas)
-5. **Mergear a master cuando lista** (auto-deploy)
+2. **Hacer push a main** (prueba el auto-deploy)
+3. **Trabajar en develop/feature branches** (features nuevas)
+4. **Mergear a main cuando lista** (auto-deploy automático)
 
 ---
 
