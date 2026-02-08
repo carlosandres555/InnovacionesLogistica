@@ -5,7 +5,9 @@
       "Bash(git config:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(aws ec2 describe-instances:*)",
+      "Bash(chmod:*)"
     ]
   }
 }
