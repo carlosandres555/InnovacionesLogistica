@@ -7,7 +7,7 @@ set -e
 
 EC2_HOST="52.201.18.118"
 EC2_USER="ubuntu"
-EC2_KEY="/Users/carlosrodriguez/Project/DistribucionCosta/innovaciones-logistica-key.pem"
+EC2_KEY="/Users/carlosrodriguez/Projects/DistribucionesCosta/innovaciones-logistica-key.pem"
 
 echo "🚀 Starting deployment to EC2..."
 echo "Host: $EC2_HOST"

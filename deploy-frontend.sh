@@ -9,15 +9,32 @@ AWS_REGION="us-east-1"
 S3_BUCKET="innovaciones-logistica-frontend"
 CLOUDFRONT_DIST_ID="E36ILM4E1Z89AZ"
 
+# Load AWS credentials from backend/.env
+if [ -f "backend/.env" ]; then
+    AWS_ACCESS_KEY_ID=$(grep "AWS_ACCESS_KEY_ID=" backend/.env | cut -d '=' -f2 | tr -d ' "')
+    AWS_SECRET_ACCESS_KEY=$(grep "AWS_SECRET_ACCESS_KEY=" backend/.env | cut -d '=' -f2 | tr -d ' "')
+fi
+
+# Export credentials
+export AWS_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY
+export AWS_REGION
+
 echo "🚀 Starting frontend deployment..."
 echo "S3 Bucket: $S3_BUCKET"
 echo "CloudFront Distribution: $CLOUDFRONT_DIST_ID"
 echo ""
 
 # Check AWS credentials
+if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+    echo "❌ Error: AWS credentials not found in backend/.env"
+    echo "Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to backend/.env"
+    exit 1
+fi
+
+# Verify with AWS
 if ! aws sts get-caller-identity > /dev/null 2>&1; then
-    echo "❌ Error: AWS credentials not configured"
-    echo "Run: aws configure"
+    echo "❌ Error: AWS credentials invalid"
     exit 1
 fi
 
