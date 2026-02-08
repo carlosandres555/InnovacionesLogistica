@@ -46,14 +46,22 @@ jobs:
             --instance-ids $EC2_INSTANCE_ID \
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
+              "set -e",
+              "export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH",
               "cd /opt/innovaciones-logistica",
+              "echo \"Step 1: Discarding local changes...\"",
               "git checkout -- . 2>/dev/null || true",
-              "GIT_SSH_COMMAND=\"ssh -i ~/.ssh/github_key\" git pull origin main",
-              "cd backend",
-              "npm install",
-              "npx prisma generate",
-              "npx prisma db push --skip-generate",
+              "echo \"Step 2: Pulling latest code (timeout 5m)...\"",
+              "timeout 300 bash -c '\''GIT_SSH_COMMAND=\"ssh -i ~/.ssh/github_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no\" git pull origin main'\''",
+              "echo \"Step 3: Installing backend deps (timeout 10m)...\"",
+              "cd backend && timeout 600 npm install",
+              "echo \"Step 4: Generating Prisma...\"",
+              "timeout 60 npx prisma generate",
+              "echo \"Step 5: Pushing DB migrations (timeout 10m)...\"",
+              "timeout 600 npx prisma db push --skip-generate",
+              "echo \"Step 6: Restarting PM2...\"",
               "pm2 restart innovaciones-api --update-env",
+              "echo \"Step 7: Showing logs...\"",
               "pm2 logs innovaciones-api --lines 20"
             ]' \
             --region us-east-1 \
