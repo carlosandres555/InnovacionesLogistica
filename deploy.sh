@@ -13,11 +13,12 @@ echo "🚀 Starting deployment to EC2..."
 echo "Host: $EC2_HOST"
 echo ""
 
-# 1. Discard local .env changes on EC2, then pull (we'll overwrite with our .env after)
+# 1. Discard local changes on EC2, then pull (we'll overwrite with our .env after)
 ssh -i "$EC2_KEY" -o StrictHostKeyChecking=no "$EC2_USER@$EC2_HOST" << 'ENDSSH'
 set -e
 cd /opt/innovaciones-logistica
-git checkout -- backend/.env 2>/dev/null || true
+echo "🧹 Discarding local changes..."
+git checkout -- . 2>/dev/null || true
 echo "📦 Pulling latest code..."
 GIT_SSH_COMMAND="ssh -i ~/.ssh/github_key" git pull origin main
 ENDSSH
