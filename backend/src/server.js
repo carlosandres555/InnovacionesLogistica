@@ -1,4 +1,4 @@
-// Test deploy - 2026-02-08 - Using aggressive SSH options
+// Test deploy - 2026-02-08 - Using AWS SSM + SSH fallback
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
