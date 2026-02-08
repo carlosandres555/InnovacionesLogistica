@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, X, LogOut, Home, Users, Zap } from 'lucide-react'
+import { Menu, X, LogOut, Home, Users, Zap, Upload } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
 export default function Layout({ children }) {
@@ -14,9 +14,15 @@ export default function Layout({ children }) {
   }
 
   const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/dashboard', label: 'Dashboard', icon: Home, permission: 'dashboard' },
     ...(user?.role === 'ADMIN'
-      ? [{ href: '/users', label: 'Usuarios', icon: Users }]
+      ? [{ href: '/users', label: 'Usuarios', icon: Users, permission: 'users' }]
+      : []),
+    ...(user?.permissions?.modules?.includes('trafico')
+      ? [{ href: '/trafico', label: 'Tráfico', icon: Zap, permission: 'trafico' }]
+      : []),
+    ...(user?.permissions?.modules?.includes('cargaInformacion')
+      ? [{ href: '/carga-informacion', label: 'Carga de Información', icon: Upload, permission: 'cargaInformacion' }]
       : [])
   ]
 

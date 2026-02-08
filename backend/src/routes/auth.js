@@ -73,7 +73,8 @@ router.post('/register', async (req, res, next) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
+        permissions: user.permissions
       }
     })
   } catch (error) {
@@ -139,7 +140,8 @@ router.post('/login', async (req, res, next) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
+        permissions: user.permissions
       }
     })
   } catch (error) {
