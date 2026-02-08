@@ -1,4 +1,4 @@
-// Test deploy - 2026-02-08 - Fixed YAML syntax
+// Test deploy - 2026-02-08 - Using appleboy/ssh-action
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
