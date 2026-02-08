@@ -39,21 +39,32 @@ jobs:
           EC2_USER: ${{ secrets.EC2_USER }}
           EC2_KEY_BASE64: ${{ secrets.EC2_KEY_BASE64 }}
         run: |
+          set -x
           mkdir -p ~/.ssh
           echo "$EC2_KEY_BASE64" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          echo "SSH key created"
           ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+          echo "SSH known_hosts updated"
 
-          ssh $EC2_USER@$EC2_HOST << 'ENDSSH'
+          ssh -v $EC2_USER@$EC2_HOST << 'ENDSSH'
+          set -x
           cd /opt/innovaciones-logistica
-          git pull origin main
+          echo "Pulling latest code..."
+          git pull origin main || echo "Git pull failed"
           cd backend
+          echo "Installing dependencies..."
           npm install
+          echo "Generating Prisma..."
           npx prisma generate
+          echo "Pushing database..."
           npx prisma db push --skip-generate
+          echo "Restarting PM2..."
           pm2 restart innovaciones-api
+          echo "Showing logs..."
           pm2 logs innovaciones-api --lines 20
           ENDSSH
+          echo "Deployment completed"
 
       # - name: Notify Slack on failure
       #   if: failure()
