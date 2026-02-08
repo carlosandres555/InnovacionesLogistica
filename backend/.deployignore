@@ -1,0 +1,63 @@
+# ============================================
+# BACKEND DEPLOY IGNORE
+# ============================================
+# Archivos/carpetas que NO se despliegan a producción
+
+# Node modules - se instalan en servidor
+node_modules/
+
+# Git
+.git
+.gitignore
+
+# Archivos locales
+.env          # Configuración local (NO se copia)
+.env.local
+.env.*.local
+*.log
+
+# Build & Desarrollo
+dist/
+build/
+.next/
+.turbo/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pruebas
+.jest/
+coverage/
+test/
+
+# Temporal
+tmp/
+temp/
+*.tmp
+
+# SSH Keys
+*.pem
+*.pub
+.ssh/
+
+# Credenciales
+.aws/
+.env.production    # Nunca deplegar con esto
+credentials.json
+
+# Lock files (se usan las versiones del servidor)
+package-lock.json
+yarn.lock
+
+# Directorios específicos del servidor
+backups/
+logs/
+uploads/

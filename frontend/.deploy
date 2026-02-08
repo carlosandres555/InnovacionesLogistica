@@ -1,0 +1,43 @@
+# ============================================
+# FRONTEND DEPLOY CONFIGURATION
+# ============================================
+# Modifica estas variables para desarrollo local
+# Al hacer deploy, siempre usa URLs de PRODUCCIÓN
+# ============================================
+
+# ============= DESARROLLO LOCAL =============
+# Cambio aquí para testing local sin afectar el deploy
+USE_STAGING=false
+
+# ============= PRODUCCIÓN (NO MODIFICAR PARA DEPLOY) =============
+PROD_API_URL="https://api.innovacioneslogistica.com/api"
+PROD_FRONTEND_URL="https://innovacioneslogistica.com"
+PROD_S3_BUCKET="innovaciones-logistica-frontend"
+PROD_CLOUDFRONT_ID="E2XYZABC123"
+PROD_AWS_REGION="us-east-1"
+
+# ============= STAGING =============
+STAGING_API_URL="https://api-staging.innovacioneslogistica.com/api"
+STAGING_FRONTEND_URL="https://staging.innovacioneslogistica.com"
+STAGING_S3_BUCKET="innovaciones-logistica-frontend-staging"
+STAGING_CLOUDFRONT_ID="E1STAGINGABC"
+STAGING_AWS_REGION="us-east-1"
+
+# ============= AWS CREDENTIALS =============
+AWS_ACCESS_KEY_ID="AKIATAIKEQVM62LPJFGZ"
+AWS_SECRET_ACCESS_KEY="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"
+
+# ============= GIT =============
+GIT_BRANCH="main"
+GIT_REMOTE="origin"
+
+# ============= BUILD =============
+VITE_BUILD_COMMAND="npm run build"
+BUILD_DIR="dist"
+
+# ============= DISTRIBUTION =============
+# CloudFront invalidation (opcional)
+INVALIDATE_CLOUDFRONT=true
+
+# ============= BACKUP =============
+KEEP_BACKUPS=3

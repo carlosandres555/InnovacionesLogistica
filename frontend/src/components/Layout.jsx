@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, X, LogOut, Home } from 'lucide-react'
+import { Menu, X, LogOut, Home, Users } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
 export default function Layout({ children }) {
@@ -15,6 +15,9 @@ export default function Layout({ children }) {
 
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
+    ...(user?.role === 'ADMIN'
+      ? [{ href: '/users', label: 'Usuarios', icon: Users }]
+      : [])
   ]
 
   return (

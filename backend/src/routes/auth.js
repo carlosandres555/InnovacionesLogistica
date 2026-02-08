@@ -100,6 +100,11 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ error: 'Invalid credentials' })
     }
 
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(401).json({ error: 'User account is inactive' })
+    }
+
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
@@ -187,6 +192,7 @@ router.get('/me', authenticateToken, async (req, res, next) => {
         lastName: true,
         phone: true,
         role: true,
+        permissions: true,
         company: {
           select: {
             id: true,

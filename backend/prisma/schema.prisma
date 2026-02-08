@@ -38,6 +38,8 @@ model User {
   lastName String
   phone String?
   role UserRole @default(CUSTOMER)
+  permissions Json? @default("{\"modules\":[\"dashboard\"]}")
+  isActive Boolean @default(true)
   ownedCompany Company? @relation("CompanyOwner")
   company Company? @relation("CompanyEmployees", fields: [companyId], references: [id], onDelete: SetNull)
   companyId String?

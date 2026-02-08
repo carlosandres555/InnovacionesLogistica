@@ -1,0 +1,43 @@
+# ============================================
+# BACKEND DEPLOY CONFIGURATION
+# ============================================
+# Modifica estas variables para desarrollo local
+# Al hacer deploy, siempre usa URLs de PRODUCCIÓN
+# ============================================
+
+# ============= DESARROLLO LOCAL =============
+# Cambio aquí para testing local sin afectar el deploy
+USE_STAGING=false
+
+# ============= PRODUCCIÓN (NO MODIFICAR PARA DEPLOY) =============
+PROD_EC2_HOST="52.201.18.118"
+PROD_EC2_USER="ubuntu"
+PROD_EC2_PORT="22"
+PROD_EC2_KEY="/Users/carlosrodriguez/.ssh/innovaciones-key.pem"
+PROD_EC2_DEPLOY_PATH="/home/ubuntu/innovaciones-backend"
+
+# ============= STAGING (Para testing antes de PROD) =============
+STAGING_EC2_HOST="ec2-staging.example.com"
+STAGING_EC2_USER="ubuntu"
+STAGING_EC2_DEPLOY_PATH="/home/ubuntu/innovaciones-backend-staging"
+
+# ============= DOCKER HUB (Opcional para imágenes) =============
+DOCKER_REGISTRY="carlosandres555"
+DOCKER_IMAGE="innovaciones-logistica-backend"
+DOCKER_TAG="latest"
+
+# ============= GIT =============
+GIT_BRANCH="main"
+GIT_REMOTE="origin"
+
+# ============= DATABASE =============
+PROD_DATABASE_URL="postgresql://adminuser:Car3118091899**@innovaciones-logistica-db.cw36keyu2btg.us-east-1.rds.amazonaws.com:5432/innovaciones_logistica"
+
+# ============= AWS =============
+AWS_REGION="us-east-1"
+AWS_S3_BUCKET="innovaciones-logistica-frontend"
+AWS_S3_UPLOADS_BUCKET="innovaciones-logistica-uploads"
+
+# ============= ROLLBACK =============
+KEEP_BACKUPS=3
+BACKUP_DIR="./backups"

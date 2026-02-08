@@ -18,6 +18,7 @@ import companiesRoutes from './routes/companies.js'
 import vehiclesRoutes from './routes/vehicles.js'
 import locationsRoutes from './routes/locations.js'
 import uploadsRoutes from './routes/uploads.js'
+import usersRoutes from './routes/users.js'
 
 // Import middleware
 import { authenticateToken } from './middleware/auth.js'
@@ -67,6 +68,7 @@ app.use('/api/companies', authenticateToken, companiesRoutes)
 app.use('/api/vehicles', authenticateToken, vehiclesRoutes)
 app.use('/api/locations', authenticateToken, locationsRoutes)
 app.use('/api/uploads', authenticateToken, uploadsRoutes)
+app.use('/api/users', authenticateToken, usersRoutes)
 
 // 404 handler
 app.use((req, res) => {
