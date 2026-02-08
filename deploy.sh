@@ -13,6 +13,12 @@ echo "🚀 Starting deployment to EC2..."
 echo "Host: $EC2_HOST"
 echo ""
 
+# Copy local .env to EC2
+echo "📋 Copying .env to EC2..."
+scp -i "$EC2_KEY" -o StrictHostKeyChecking=no backend/.env "$EC2_USER@$EC2_HOST":/opt/innovaciones-logistica/backend/.env
+echo "✅ .env copied"
+echo ""
+
 # SSH deployment script
 ssh -i "$EC2_KEY" -o StrictHostKeyChecking=no "$EC2_USER@$EC2_HOST" << 'ENDSSH'
 set -e
