@@ -59,16 +59,16 @@ export default function LoginPage() {
         {/* Card Container */}
         <div className="relative group">
           {/* Gradient Border Effect */}
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 via-red-500 to-red-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 via-rose-400 to-red-500 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
 
           {/* Main Card */}
           <div className="relative bg-slate-900 rounded-2xl p-8 sm:p-10 backdrop-blur-xl border border-red-700/30">
             {/* Logo Section */}
             <div className="flex items-center justify-center mb-8">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-700 shadow-lg">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-rose-400 shadow-lg">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <h1 className="ml-3 text-3xl font-bold bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">
+              <h1 className="ml-3 text-3xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">
                 Innovaciones
               </h1>
             </div>
@@ -151,7 +151,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-3 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:shadow-red-900/50 group"
+                className="w-full bg-gradient-to-r from-red-600 to-red-400 hover:from-red-500 hover:to-red-300 text-white py-3 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:shadow-red-900/50 group"
               >
                 <span className="flex items-center justify-center gap-2">
                   {loading ? (

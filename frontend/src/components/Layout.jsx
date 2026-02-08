@@ -21,7 +21,7 @@ export default function Layout({ children }) {
   ]
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="flex h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100">
       {/* Sidebar - Fixed on mobile, relative on desktop */}
       <aside
         className={`${
@@ -31,10 +31,10 @@ export default function Layout({ children }) {
         {/* Logo Section */}
         <div className="p-6 border-b border-red-700/30">
           <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-red-400 to-red-600">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-red-500 to-rose-400">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">
               Innovaciones
             </h1>
           </div>
@@ -93,7 +93,7 @@ export default function Layout({ children }) {
         {/* Desktop header */}
         <div className="hidden lg:block bg-gradient-to-r from-slate-900 to-slate-800 border-b border-red-700/20 shadow-lg">
           <div className="px-6 py-5 flex items-center justify-between">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">
               {user?.company?.name || 'Panel de Control'}
             </h2>
             <div className="flex items-center gap-6">

@@ -103,14 +103,14 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-400 via-red-300 to-orange-300 bg-clip-text text-transparent mb-1">
+          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent mb-1">
             Gestión de Usuarios
           </h1>
-          <p className="text-red-200/70 text-sm">Administra los usuarios del sistema</p>
+          <p className="text-gray-600 text-sm">Administra los usuarios del sistema</p>
         </div>
         <button
           onClick={handleCreateClick}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl transition-all duration-300 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-red-900/50"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-400 hover:from-red-500 hover:to-red-300 text-white px-6 py-3 rounded-xl transition-all duration-300 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-red-900/50"
         >
           <Plus className="w-5 h-5" />
           Crear Usuario
@@ -118,10 +118,9 @@ export default function UsersPage() {
       </div>
 
       {/* Search Card */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-900/30 to-red-950/30 border border-red-700/30 p-6 backdrop-blur-sm">
-        <div className="absolute -right-20 -top-20 w-40 h-40 bg-gradient-to-br from-red-600/10 to-transparent rounded-full blur-3xl"></div>
+      <div className="relative overflow-hidden rounded-2xl bg-white border-2 border-red-500/20 p-6 shadow-lg">
         <div className="relative">
-          <Search className="absolute left-4 top-4 w-5 h-5 text-red-400/60" />
+          <Search className="absolute left-4 top-4 w-5 h-5 text-red-500" />
           <input
             type="text"
             placeholder="Buscar por nombre, apellido o email..."
@@ -130,31 +129,31 @@ export default function UsersPage() {
               setSearch(e.target.value)
               setPage(1)
             }}
-            className="w-full pl-12 pr-4 py-3 text-sm bg-slate-800/50 border border-red-700/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition text-white placeholder-red-300/50"
+            className="w-full pl-12 pr-4 py-3 text-sm bg-gray-50 border border-red-500/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition text-gray-900 placeholder-gray-400"
           />
         </div>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="p-4 bg-red-950/40 border border-red-700/50 rounded-xl flex items-center gap-3 backdrop-blur-sm">
-          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-          <p className="text-red-300 text-sm">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+          <p className="text-red-700 text-sm">
             {error.message || 'Error al cargar usuarios'}
           </p>
         </div>
       )}
 
       {/* Table Container */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-900/20 to-red-950/20 border border-red-700/30 backdrop-blur-sm">
+      <div className="relative overflow-hidden rounded-2xl bg-white border-2 border-red-500/20 shadow-lg">
         {/* Table */}
         {isLoading ? (
-          <div className="p-12 text-center text-red-200/70 text-sm">
-            <div className="inline-block w-8 h-8 border-3 border-red-400/30 border-t-red-400 rounded-full animate-spin mb-4"></div>
+          <div className="p-12 text-center text-gray-500 text-sm">
+            <div className="inline-block w-8 h-8 border-3 border-red-400/30 border-t-red-500 rounded-full animate-spin mb-4"></div>
             <p>Cargando usuarios...</p>
           </div>
         ) : data?.users?.length === 0 ? (
-          <div className="p-12 text-center text-red-200/70 text-sm">
+          <div className="p-12 text-center text-gray-500 text-sm">
             <p>No hay usuarios para mostrar</p>
           </div>
         ) : (
@@ -162,9 +161,9 @@ export default function UsersPage() {
             {/* Desktop Table */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-red-900/50 to-red-950/50 border-b border-red-700/30">
+                <thead className="bg-gradient-to-r from-red-50 to-rose-50 border-b border-red-500/20">
                   <tr>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-900">
                       Usuario
                     </th>
                     <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
@@ -184,26 +183,26 @@ export default function UsersPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-red-700/20">
+                <tbody className="divide-y divide-red-500/10">
                   {data?.users?.map(user => (
                     <tr
                       key={user.id}
-                      className="hover:bg-red-700/10 transition-colors duration-200"
+                      className="hover:bg-red-50 transition-colors duration-200"
                     >
                       <td className="px-4 sm:px-6 py-4">
                         <div>
-                          <p className="font-medium text-white text-sm">
+                          <p className="font-medium text-gray-900 text-sm">
                             {user.firstName} {user.lastName}
                           </p>
-                          <p className="text-xs text-red-300/60">
+                          <p className="text-xs text-gray-500">
                             ID: {user.id.substring(0, 8)}
                           </p>
                         </div>
                       </td>
-                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-red-200/80">
+                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-700">
                         {user.email}
                       </td>
-                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-red-200/80">
+                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-700">
                         {user.phone || '-'}
                       </td>
                       <td className="px-4 sm:px-6 py-4">
@@ -265,14 +264,14 @@ export default function UsersPage() {
               {data?.users?.map(user => (
                 <div
                   key={user.id}
-                  className="border border-red-700/30 rounded-xl p-4 space-y-3 bg-red-900/10 hover:bg-red-900/20 transition-colors duration-200"
+                  className="border border-red-500/20 rounded-xl p-4 space-y-3 bg-red-50/30 hover:bg-red-50 transition-colors duration-200"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <p className="font-medium text-white text-sm">
+                      <p className="font-medium text-gray-900 text-sm">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-xs text-red-300/60">
+                      <p className="text-xs text-gray-500">
                         ID: {user.id.substring(0, 8)}
                       </p>
                     </div>
@@ -306,12 +305,12 @@ export default function UsersPage() {
 
                   <div className="space-y-2 text-xs sm:text-sm">
                     <div>
-                      <span className="text-red-300/60">Email: </span>
-                      <span className="text-red-200/80">{user.email}</span>
+                      <span className="text-gray-500">Email: </span>
+                      <span className="text-gray-700">{user.email}</span>
                     </div>
                     <div>
-                      <span className="text-red-300/60">Teléfono: </span>
-                      <span className="text-red-200/80">{user.phone || '-'}</span>
+                      <span className="text-gray-500">Teléfono: </span>
+                      <span className="text-gray-700">{user.phone || '-'}</span>
                     </div>
                     <div className="flex gap-2">
                       <span
@@ -340,8 +339,8 @@ export default function UsersPage() {
 
         {/* Pagination */}
         {data?.pagination && data.pagination.pages > 1 && (
-          <div className="px-4 sm:px-6 py-4 border-t border-red-700/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-red-900/20 to-transparent">
-            <p className="text-xs sm:text-sm text-red-200/70">
+          <div className="px-4 sm:px-6 py-4 border-t border-red-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-red-50/30">
+            <p className="text-xs sm:text-sm text-gray-600">
               Página {data.pagination.page} de {data.pagination.pages} (
               {data.pagination.total} usuarios)
             </p>
@@ -349,14 +348,14 @@ export default function UsersPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 text-sm border border-red-700/30 bg-red-900/20 hover:bg-red-900/40 text-red-300 rounded-lg disabled:opacity-50 transition"
+                className="px-4 py-2 text-sm border border-red-500/20 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg disabled:opacity-50 transition"
               >
                 Anterior
               </button>
               <button
                 onClick={() => setPage(p => Math.min(data.pagination.pages, p + 1))}
                 disabled={page === data.pagination.pages}
-                className="px-4 py-2 text-sm border border-red-700/30 bg-red-900/20 hover:bg-red-900/40 text-red-300 rounded-lg disabled:opacity-50 transition"
+                className="px-4 py-2 text-sm border border-red-500/20 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg disabled:opacity-50 transition"
               >
                 Siguiente
               </button>
