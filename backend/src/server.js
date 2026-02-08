@@ -1,4 +1,4 @@
-// Test deploy - 2026-02-08
+// Test deploy - 2026-02-08 - Fixed SSH keyscan
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
