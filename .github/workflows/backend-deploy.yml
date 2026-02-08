@@ -48,6 +48,7 @@ jobs:
             --parameters 'commands=[
               "set -e",
               "export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH",
+              "git config --global --add safe.directory /opt/innovaciones-logistica",
               "cd /opt/innovaciones-logistica",
               "echo \"Step 1: Discarding local changes...\"",
               "git checkout -- . 2>/dev/null || true",
