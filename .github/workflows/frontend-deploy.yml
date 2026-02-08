@@ -3,7 +3,7 @@ name: Deploy Frontend to S3
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-deploy.yml'
@@ -40,7 +40,9 @@ jobs:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
         run: |
           cd frontend
+          echo "Uploading to S3 bucket: $S3_BUCKET"
           aws s3 sync dist/ s3://$S3_BUCKET --delete --region $AWS_REGION
+          echo "Upload complete"
 
       - name: Invalidate CloudFront
         env:
@@ -48,7 +50,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           CLOUDFRONT_DIST_ID: ${{ secrets.CLOUDFRONT_DIST_ID }}
         run: |
+          echo "Invalidating CloudFront distribution: $CLOUDFRONT_DIST_ID"
           aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DIST_ID --paths "/*"
+          echo "Invalidation complete"
 
       - name: Notify Slack on failure
         if: failure()

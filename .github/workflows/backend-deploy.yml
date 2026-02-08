@@ -3,7 +3,7 @@ name: Deploy Backend to EC2
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'backend/**'
       - '.github/workflows/backend-deploy.yml'
@@ -46,11 +46,13 @@ jobs:
 
           ssh $EC2_USER@$EC2_HOST << 'ENDSSH'
           cd /opt/innovaciones-logistica
-          git pull origin main
+          git pull origin master
           cd backend
           npm install
+          npx prisma generate
           npm run db:migrate --if-present
           pm2 restart innovaciones-api
+          pm2 logs innovaciones-api --lines 20
           ENDSSH
 
       - name: Notify Slack on failure
