@@ -55,11 +55,11 @@ jobs:
           pm2 logs innovaciones-api --lines 20
           ENDSSH
 
-      - name: Notify Slack on failure
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: 'Backend deployment failed'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        continue-on-error: true
+      # - name: Notify Slack on failure
+      #   if: failure()
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     text: 'Backend deployment failed'
+      #     webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      #   continue-on-error: true

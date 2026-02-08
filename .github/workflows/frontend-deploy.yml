@@ -54,11 +54,11 @@ jobs:
           aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DIST_ID --paths "/*"
           echo "Invalidation complete"
 
-      - name: Notify Slack on failure
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: 'Frontend deployment failed'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        continue-on-error: true
+      # - name: Notify Slack on failure
+      #   if: failure()
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     text: 'Frontend deployment failed'
+      #     webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      #   continue-on-error: true
