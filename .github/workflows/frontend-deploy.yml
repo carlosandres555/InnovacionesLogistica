@@ -3,7 +3,6 @@ name: Deploy Frontend to S3
 on:
   push:
     branches:
-      - develop
       - main
     paths:
       - 'frontend/**'
