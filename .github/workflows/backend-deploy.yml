@@ -33,36 +33,44 @@ jobs:
           npm run test --if-present
         continue-on-error: true
 
-      - name: Deploy to EC2
+      - name: Deploy to EC2 via SSM
         env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_KEY: ${{ secrets.EC2_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          EC2_INSTANCE_ID: i-02a5cb6ddd9604891
         run: |
-          mkdir -p ~/.ssh
-          echo "$EC2_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-          # Use aggressive SSH options to bypass connectivity issues
-          ssh -o BatchMode=yes \
-              -o ConnectTimeout=60 \
-              -o StrictHostKeyChecking=no \
-              -o UserKnownHostsFile=/dev/null \
-              -o ServerAliveInterval=10 \
-              -o ServerAliveCountMax=10 \
-              -o ProxyUseFdpass=no \
-              $EC2_USER@$EC2_HOST 'bash -s' << 'ENDSSH'
+          # Create deployment script file
+          cat > /tmp/deploy.sh << 'DEPLOY_SCRIPT'
           set -x
           cd /opt/innovaciones-logistica
+          echo "Pulling latest code..."
           git pull origin main || echo "Git pull failed"
           cd backend
+          echo "Installing dependencies..."
           npm install
+          echo "Generating Prisma..."
           npx prisma generate
+          echo "Pushing database..."
           npx prisma db push --skip-generate
+          echo "Restarting PM2..."
           pm2 restart innovaciones-api
-          sleep 2
+          echo "✅ Deployment completed"
           pm2 logs innovaciones-api --lines 20
-          ENDSSH
+          DEPLOY_SCRIPT
+
+          # Execute via SSM
+          aws ssm send-command \
+            --instance-ids $EC2_INSTANCE_ID \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[cat /tmp/deploy.sh | bash]' \
+            --region us-east-1 || echo "SSM failed, trying SSH..."
+
+          # Fallback to SSH if SSM fails
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.EC2_HOST }} 'bash -s' < /tmp/deploy.sh
 
       # - name: Notify Slack on failure
       #   if: failure()
