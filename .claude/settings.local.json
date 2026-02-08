@@ -35,7 +35,25 @@
       "Bash(./deploy-all.sh prod)",
       "Bash(./deploy.sh:*)",
       "Bash(npm run db:migrate:*)",
-      "Bash(npx prisma generate:*)"
+      "Bash(npx prisma generate:*)",
+      "Bash(aws cloudfront get-distribution:*)",
+      "Bash(aws cloudfront update-distribution:*)",
+      "Bash(aws s3api get-bucket-policy:*)",
+      "Bash(aws cloudfront get-origin-access-control:*)",
+      "Bash(/tmp/s3-policy.json << 'EOF'\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"AllowCloudFrontOAC\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"Service\": \"cloudfront.amazonaws.com\"\n      },\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::innovaciones-logistica-frontend/*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"AWS:SourceArn\": \"arn:aws:cloudfront::206716568921:distribution/E36ILM4E1Z89AZ\"\n        }\n      }\n    }\n  ]\n}\nEOF)",
+      "Bash(__NEW_LINE_cdc40f035020931c__ aws s3api put-bucket-policy --bucket innovaciones-logistica-frontend --policy file:///tmp/s3-policy.json)",
+      "Bash(__NEW_LINE_cdc40f035020931c__ echo \"✅ S3 bucket policy updated\")",
+      "Bash(aws cloudfront create-invalidation:*)",
+      "Bash(aws cloudfront get-distribution-config:*)",
+      "Bash(/tmp/s3-policy-oac.json << 'EOF'\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"AllowCloudFrontDistribution\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\": \"arn:aws:iam::cloudfront:distribution/E36ILM4E1Z89AZ\"\n      },\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::innovaciones-logistica-frontend/*\"\n    },\n    {\n      \"Sid\": \"AllowCloudFrontListBucket\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\": \"arn:aws:iam::cloudfront:distribution/E36ILM4E1Z89AZ\"\n      },\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::innovaciones-logistica-frontend\"\n    }\n  ]\n}\nEOF)",
+      "Bash(__NEW_LINE_359d415f731e7873__ aws s3api put-bucket-policy --bucket innovaciones-logistica-frontend --policy file:///tmp/s3-policy-oac.json)",
+      "Bash(__NEW_LINE_359d415f731e7873__ echo \"✅ Policy updated\")",
+      "Bash(aws s3api delete-bucket-website:*)",
+      "Bash(/tmp/s3-public-policy.json << 'EOF'\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"PublicReadGetObject\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::innovaciones-logistica-frontend/*\"\n    }\n  ]\n}\nEOF)",
+      "Bash(__NEW_LINE_e6d4d7fff937f445__ aws s3api put-bucket-policy --bucket innovaciones-logistica-frontend --policy file:///tmp/s3-public-policy.json)",
+      "Bash(__NEW_LINE_e6d4d7fff937f445__ echo \"✅ S3 policy reverted to public\")",
+      "Bash(aws s3api get-public-access-block:*)",
+      "Bash(aws s3 ls:*)"
     ]
   }
 }
