@@ -61,13 +61,13 @@ npm run dev
 ## Fases de Implementación
 
 1. ✅ Setup inicial
-2. ⏳ Base de datos
-3. ⏳ Backend API
-4. ⏳ Deployment backend
-5. ⏳ Frontend React
-6. ⏳ Deployment frontend
+2. ✅ Base de datos (RDS)
+3. ✅ Backend API (Express + Prisma)
+4. ✅ Deployment backend (EC2 + PM2)
+5. ✅ Frontend React (Vite)
+6. ⏳ Deployment frontend (S3)
 7. ⏳ Almacenamiento S3
-8. ⏳ Características avanzadas
+8. ⏳ Características avanzadas (Shipments, Tracking)
 9. ⏳ Testing y seguridad
 10. ⏳ Documentación y launch
 
