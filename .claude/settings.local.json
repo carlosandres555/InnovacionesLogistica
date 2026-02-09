@@ -53,7 +53,10 @@
       "Bash(__NEW_LINE_e6d4d7fff937f445__ aws s3api put-bucket-policy --bucket innovaciones-logistica-frontend --policy file:///tmp/s3-public-policy.json)",
       "Bash(__NEW_LINE_e6d4d7fff937f445__ echo \"✅ S3 policy reverted to public\")",
       "Bash(aws s3api get-public-access-block:*)",
-      "Bash(aws s3 ls:*)"
+      "Bash(aws s3 ls:*)",
+      "Bash(ssh:*)",
+      "Bash(git -C /Users/carlosrodriguez/Project/DistribucionCosta branch -a)",
+      "Bash(git -C /Users/carlosrodriguez/Project/DistribucionCosta remote -v)"
     ]
   }
 }
