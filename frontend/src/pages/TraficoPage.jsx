@@ -28,6 +28,7 @@ export default function TraficoPage() {
 
   useEffect(() => {
     loadDeliveryStatuses()
+    setEntregaStatuses({}) // Limpiar estados previos
     loadTraficoData()
   }, [page, filters])
 
@@ -51,6 +52,13 @@ export default function TraficoPage() {
       setData(result.details)
       setTotalPages(result.pagination.pages)
       setError(null)
+
+      // Cargar estados de todas las entregas automáticamente
+      if (result.details && result.details.length > 0) {
+        result.details.forEach(entrega => {
+          loadEntregaStatus(entrega.id)
+        })
+      }
     } catch (err) {
       setError('Error al cargar datos de tráfico')
       console.error(err)
