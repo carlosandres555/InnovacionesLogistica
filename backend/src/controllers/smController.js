@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import XLSX from 'xlsx';
 import { z } from "zod";
-import { isFechaToday, isFechaPast } from '../utils/dateUtils.js';
+import { isFechaToday, isFechaPast, parseFechaString } from '../utils/dateUtils.js';
 
 const prisma = new PrismaClient();
 
@@ -498,10 +498,10 @@ export const getHistoricoData = async (req, res, next) => {
         // Normalizar detalleFecha a medianoche para comparación correcta
         detalleFecha.setHours(0, 0, 0, 0);
 
-        if (desde && detalleFecha < desde) return false;
-        if (hasta && detalleFecha > hasta) return false;
+        const isAfterDesde = !desde || detalleFecha >= desde;
+        const isBeforeHasta = !hasta || detalleFecha <= hasta;
 
-        return true;
+        return isAfterDesde && isBeforeHasta;
       });
     } else {
       // Si no hay rango especificado, filtrar solo registros PASADOS
@@ -593,10 +593,10 @@ export const exportHistoricoExcel = async (req, res, next) => {
         // Normalizar detalleFecha a medianoche para comparación correcta
         detalleFecha.setHours(0, 0, 0, 0);
 
-        if (desde && detalleFecha < desde) return false;
-        if (hasta && detalleFecha > hasta) return false;
+        const isAfterDesde = !desde || detalleFecha >= desde;
+        const isBeforeHasta = !hasta || detalleFecha <= hasta;
 
-        return true;
+        return isAfterDesde && isBeforeHasta;
       });
     } else {
       // Si no hay rango especificado, filtrar solo registros PASADOS
