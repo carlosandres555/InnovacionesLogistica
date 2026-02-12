@@ -124,6 +124,21 @@ export default function TraficoPage() {
     }
   }
 
+  const getProgressData = (entregas) => {
+    const total = entregas.length
+    const asignadas = entregas.filter(e => entregaStatuses[e.id]?.status).length
+    const porcentaje = total > 0 ? Math.round((asignadas / total) * 100) : 0
+    return { total, asignadas, porcentaje }
+  }
+
+  const getProgressColor = (porcentaje) => {
+    if (porcentaje === 100) return 'bg-green-500'
+    if (porcentaje >= 75) return 'bg-blue-500'
+    if (porcentaje >= 50) return 'bg-yellow-500'
+    if (porcentaje >= 25) return 'bg-orange-500'
+    return 'bg-red-500'
+  }
+
   // Agrupar por numCarga
   const groupedByNumCarga = data.reduce((acc, item) => {
     if (!acc[item.numCarga]) {
@@ -276,6 +291,27 @@ export default function TraficoPage() {
                     <ChevronDown className="w-5 h-5 text-gray-400" />
                   )}
                 </button>
+
+                {/* Barra de progreso de asignación */}
+                {(() => {
+                  const progress = getProgressData(carga.entregas)
+                  return (
+                    <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-semibold text-gray-700">
+                          Estados Asignados: {progress.asignadas} de {progress.total}
+                        </p>
+                        <p className="text-xs font-bold text-gray-900">{progress.porcentaje}%</p>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(progress.porcentaje)}`}
+                          style={{ width: `${progress.porcentaje}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* Detalles de entregas */}
                 {expandedCarga === carga.numCarga && (
