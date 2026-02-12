@@ -215,8 +215,21 @@ model DeliveryStatus {
   nombre String @unique // EXITOSA, PARCIAL, NO EXITOSA
   descripcion String?
   color String? // Para UI: green, orange, red
+  razones DeliveryStatusReason[] // Motivos asociados
   entregas EntregaDeliveryStatus[]
   createdAt DateTime @default(now())
+}
+
+model DeliveryStatusReason {
+  id String @id @default(cuid())
+  status DeliveryStatus @relation(fields: [statusId], references: [id], onDelete: Cascade)
+  statusId String
+  nombre String // ej: "Producto dañado", "Cliente no disponible"
+  descripcion String?
+  entregas EntregaDeliveryStatus[] // Entregas que tienen este motivo
+  createdAt DateTime @default(now())
+  @@unique([statusId, nombre]) // No permitir motivos duplicados por estado
+  @@index([statusId])
 }
 
 model EntregaDeliveryStatus {
@@ -225,10 +238,13 @@ model EntregaDeliveryStatus {
   entregaId String @unique
   status DeliveryStatus @relation(fields: [statusId], references: [id], onDelete: Restrict)
   statusId String
+  reason DeliveryStatusReason? @relation(fields: [reasonId], references: [id], onDelete: SetNull)
+  reasonId String?
   observaciones String?
   updatedBy User? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
   updatedById String?
   updatedAt DateTime @updatedAt
   @@index([entregaId])
   @@index([statusId])
+  @@index([reasonId])
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Settings, Plus, Trash2, AlertCircle, Loader } from 'lucide-react'
+import { Settings, Plus, Trash2, AlertCircle, Loader, ChevronDown, ChevronUp } from 'lucide-react'
 import { deliveryStatusApi } from '../services/deliveryStatusApi'
 
 export default function AdminPage() {
@@ -9,11 +9,21 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  const [expandedStatus, setExpandedStatus] = useState(null)
+  const [reasonsLoading, setReasonsLoading] = useState({})
+  const [statusReasons, setStatusReasons] = useState({}) // { statusId: [reasons] }
+  const [showReasonForm, setShowReasonForm] = useState(null) // statusId or null
+  const [reasonFormSubmitting, setReasonFormSubmitting] = useState(false)
 
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
     color: 'gray',
+  })
+
+  const [reasonFormData, setReasonFormData] = useState({
+    nombre: '',
+    descripcion: '',
   })
 
   const colorOptions = [
@@ -93,6 +103,68 @@ export default function AdminPage() {
   const getColorBg = (color) => {
     const option = colorOptions.find(opt => opt.value === color)
     return option ? option.bg : 'bg-gray-100'
+  }
+
+  const loadReasonsByStatus = async (statusId) => {
+    try {
+      setReasonsLoading(prev => ({ ...prev, [statusId]: true }))
+      const reasons = await deliveryStatusApi.getReasonsByStatus(statusId)
+      setStatusReasons(prev => ({
+        ...prev,
+        [statusId]: reasons,
+      }))
+    } catch (err) {
+      console.error('Error cargando motivos:', err)
+    } finally {
+      setReasonsLoading(prev => ({ ...prev, [statusId]: false }))
+    }
+  }
+
+  const handleReasonInputChange = (e) => {
+    const { name, value } = e.target
+    setReasonFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleAddReason = async (e, statusId) => {
+    e.preventDefault()
+
+    if (!reasonFormData.nombre.trim()) {
+      setError('El nombre del motivo es requerido')
+      return
+    }
+
+    setReasonFormSubmitting(true)
+    setError(null)
+
+    try {
+      await deliveryStatusApi.createDeliveryStatusReason(
+        statusId,
+        reasonFormData.nombre,
+        reasonFormData.descripcion
+      )
+
+      setSuccessMessage(`Motivo "${reasonFormData.nombre}" creado exitosamente`)
+      setReasonFormData({ nombre: '', descripcion: '' })
+      setShowReasonForm(null)
+
+      // Reload reasons
+      await loadReasonsByStatus(statusId)
+
+      // Clear message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000)
+    } catch (err) {
+      if (err.response?.data?.error) {
+        setError(err.response.data.error)
+      } else {
+        setError('Error al crear motivo de entrega')
+      }
+      console.error(err)
+    } finally {
+      setReasonFormSubmitting(false)
+    }
   }
 
   return (
@@ -226,25 +298,151 @@ export default function AdminPage() {
             <p className="text-gray-600">No hay estados creados</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {statuses.map(status => (
               <div
                 key={status.id}
-                className={`p-4 rounded-lg border-2 ${getColorBg(status.color)} border-opacity-50`}
+                className={`rounded-lg border-2 border-opacity-50 ${getColorBg(status.color)}`}
               >
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  {status.nombre}
-                </h3>
-                {status.descripcion && (
-                  <p className="text-sm text-gray-700 mb-3">
-                    {status.descripcion}
-                  </p>
+                {/* Status Header */}
+                <button
+                  onClick={() => {
+                    const isExpanding = expandedStatus !== status.id
+                    setExpandedStatus(isExpanding ? status.id : null)
+                    if (isExpanding && !statusReasons[status.id]) {
+                      loadReasonsByStatus(status.id)
+                    }
+                  }}
+                  className="w-full p-4 flex items-center justify-between hover:bg-black/5 rounded-t-lg transition-colors"
+                >
+                  <div className="text-left flex-1">
+                    <h3 className="text-lg font-bold text-gray-900">
+                      {status.nombre}
+                    </h3>
+                    {status.descripcion && (
+                      <p className="text-sm text-gray-700 mt-1">
+                        {status.descripcion}
+                      </p>
+                    )}
+                    <span className={`inline-block text-xs font-semibold px-2 py-1 rounded mt-2 ${getColorBg(status.color)}`}>
+                      Color: {status.color}
+                    </span>
+                  </div>
+                  {expandedStatus === status.id ? (
+                    <ChevronUp className="w-5 h-5 text-gray-600" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-600" />
+                  )}
+                </button>
+
+                {/* Status Details - Reasons */}
+                {expandedStatus === status.id && (
+                  <div className="border-t border-opacity-50 p-4 bg-black/2">
+                    {/* Reasons List */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                        Motivos Asociados
+                      </h4>
+
+                      {reasonsLoading[status.id] ? (
+                        <div className="text-center py-4">
+                          <Loader className="w-4 h-4 animate-spin mx-auto text-gray-400" />
+                        </div>
+                      ) : statusReasons[status.id]?.length === 0 ? (
+                        <p className="text-sm text-gray-600 italic">
+                          No hay motivos asociados
+                        </p>
+                      ) : (
+                        <div className="space-y-2 mb-3">
+                          {statusReasons[status.id]?.map(reason => (
+                            <div key={reason.id} className="bg-white rounded p-2 text-sm">
+                              <p className="font-medium text-gray-900">{reason.nombre}</p>
+                              {reason.descripcion && (
+                                <p className="text-xs text-gray-600">{reason.descripcion}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Add Reason Form */}
+                    {showReasonForm === status.id ? (
+                      <form
+                        onSubmit={(e) => handleAddReason(e, status.id)}
+                        className="bg-white rounded-lg p-3 space-y-3 border border-gray-200"
+                      >
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-900 mb-1">
+                            Nombre del Motivo *
+                          </label>
+                          <input
+                            type="text"
+                            name="nombre"
+                            value={reasonFormData.nombre}
+                            onChange={handleReasonInputChange}
+                            placeholder="ej: Producto dañado"
+                            className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            disabled={reasonFormSubmitting}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-900 mb-1">
+                            Descripción
+                          </label>
+                          <textarea
+                            name="descripcion"
+                            value={reasonFormData.descripcion}
+                            onChange={handleReasonInputChange}
+                            placeholder="Descripción (opcional)"
+                            rows="2"
+                            className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            disabled={reasonFormSubmitting}
+                          />
+                        </div>
+
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={reasonFormSubmitting}
+                            className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-1 px-3 rounded text-sm transition-colors flex items-center justify-center gap-1"
+                          >
+                            {reasonFormSubmitting ? (
+                              <>
+                                <Loader className="w-3 h-3 animate-spin" />
+                                Creando...
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="w-3 h-3" />
+                                Crear Motivo
+                              </>
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowReasonForm(null)
+                              setReasonFormData({ nombre: '', descripcion: '' })
+                            }}
+                            className="bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-1 px-3 rounded text-sm transition-colors"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <button
+                        onClick={() => setShowReasonForm(status.id)}
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded text-sm transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Agregar Motivo
+                      </button>
+                    )}
+                  </div>
                 )}
-                <div className="flex items-center justify-between">
-                  <span className={`text-xs font-semibold px-2 py-1 rounded ${getColorBg(status.color)}`}>
-                    Color: {status.color}
-                  </span>
-                </div>
               </div>
             ))}
           </div>

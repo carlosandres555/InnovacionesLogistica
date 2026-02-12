@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Zap, ChevronDown, ChevronUp, Filter, Truck, Check, AlertCircle, XCircle, Loader } from 'lucide-react'
+import { Zap, ChevronDown, ChevronUp, Filter, Truck, Check, AlertCircle, XCircle, Loader, Edit } from 'lucide-react'
 import { smApi } from '../services/smApi'
 import { deliveryStatusApi } from '../services/deliveryStatusApi'
+import DeliveryStatusModal from '../components/DeliveryStatusModal'
 
 export default function TraficoPage() {
   const [data, setData] = useState([])
@@ -13,6 +14,8 @@ export default function TraficoPage() {
   const [deliveryStatuses, setDeliveryStatuses] = useState([])
   const [entregaStatuses, setEntregaStatuses] = useState({}) // { entregaId: { id, status, ... } }
   const [updatingEntrega, setUpdatingEntrega] = useState(null)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedEntrega, setSelectedEntrega] = useState(null)
 
   // Filtros
   const [filters, setFilters] = useState({
@@ -72,6 +75,13 @@ export default function TraficoPage() {
       }))
     } catch (err) {
       console.error('Error cargando estado de entrega:', err)
+    }
+  }
+
+  const handleModalSave = async () => {
+    // Reload the status for the updated entrega
+    if (selectedEntrega) {
+      await loadEntregaStatus(selectedEntrega.id)
     }
   }
 
@@ -304,7 +314,7 @@ export default function TraficoPage() {
                             )}
                           </div>
 
-                          {/* Estado de entrega - Selector */}
+                          {/* Estado de entrega - Modal Trigger */}
                           <div className="mt-4 pt-4 border-t border-gray-200">
                             <p className="text-xs text-gray-600 font-semibold mb-2">Estado de Entrega</p>
                             <div className="flex items-center gap-2">
@@ -323,18 +333,17 @@ export default function TraficoPage() {
                                   ) : (
                                     <span className="text-sm text-gray-500">Sin estado asignado</span>
                                   )}
-                                  <select
-                                    onChange={(e) => handleUpdateEntregaStatus(entrega.id, e.target.value)}
-                                    defaultValue=""
-                                    className="px-3 py-1 text-sm border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  <button
+                                    onClick={() => {
+                                      setSelectedEntrega(entrega)
+                                      setModalOpen(true)
+                                    }}
+                                    className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                                    title="Editar estado"
                                   >
-                                    <option value="">Cambiar estado...</option>
-                                    {deliveryStatuses.map((status) => (
-                                      <option key={status.id} value={status.id}>
-                                        {status.nombre}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    <Edit className="w-4 h-4 text-gray-600" />
+                                    <span>Editar</span>
+                                  </button>
                                 </>
                               )}
                             </div>
@@ -348,6 +357,19 @@ export default function TraficoPage() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* Delivery Status Modal */}
+      {selectedEntrega && (
+        <DeliveryStatusModal
+          entrega={selectedEntrega}
+          isOpen={modalOpen}
+          onClose={() => {
+            setModalOpen(false)
+            setSelectedEntrega(null)
+          }}
+          onSave={handleModalSave}
+        />
       )}
     </div>
   )

@@ -9,6 +9,19 @@ export const deliveryStatusApi = {
     return data
   },
 
+  // Obtener motivos para un estado específico
+  getReasonsByStatus: async (statusId) => {
+    try {
+      const { data } = await axios.get(`${API_URL}/delivery-status/reasons/${statusId}`)
+      return data
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return []
+      }
+      throw error
+    }
+  },
+
   // Obtener estado de una entrega específica
   getEntregaStatus: async (entregaId) => {
     try {
@@ -23,10 +36,11 @@ export const deliveryStatusApi = {
     }
   },
 
-  // Actualizar estado de una entrega
-  updateEntregaStatus: async (entregaId, statusId, observaciones = '') => {
+  // Actualizar estado de una entrega (con motivo opcional)
+  updateEntregaStatus: async (entregaId, statusId, reasonId = null, observaciones = '') => {
     const { data } = await axios.put(`${API_URL}/delivery-status/entrega/${entregaId}`, {
       statusId,
+      reasonId,
       observaciones,
     })
     return data
@@ -38,6 +52,16 @@ export const deliveryStatusApi = {
       nombre,
       descripcion,
       color,
+    })
+    return data
+  },
+
+  // Crear nuevo motivo para un estado (admin only)
+  createDeliveryStatusReason: async (statusId, nombre, descripcion = '') => {
+    const { data } = await axios.post(`${API_URL}/delivery-status/reasons`, {
+      statusId,
+      nombre,
+      descripcion,
     })
     return data
   },
