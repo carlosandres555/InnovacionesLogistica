@@ -36,7 +36,7 @@ export const getSMUploads = async (req, res, next) => {
 
     const [uploads, total] = await Promise.all([
       prisma.sMUpload.findMany({
-        where: { companyId: req.user.companyId },
+        where: {},
         select: {
           id: true,
           fileName: true,
@@ -81,11 +81,10 @@ export const getSMDetails = async (req, res, next) => {
     const { page = 1, limit = 20, fecha, ruta, ciudad } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Verificar que el upload pertenece a la compañía del usuario
+    // Verificar que el upload existe
     const upload = await prisma.sMUpload.findFirst({
       where: {
         id: uploadId,
-        companyId: req.user.companyId,
       },
     });
 
@@ -246,7 +245,7 @@ export const uploadSMFile = async (req, res, next) => {
       const smUpload = await prisma.sMUpload.create({
         data: {
           fileName,
-          companyId: req.user.companyId,
+          companyId: req.user.companyId || "default-company",
           uploadedById: req.user.id,
           status: "completed",
           totalRecords: processedData.length,
@@ -310,11 +309,7 @@ export const getTraficoData = async (req, res, next) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Construir filtros
-    const filters = {
-      smUpload: {
-        companyId: req.user.companyId,
-      },
-    };
+    const filters = {};
 
     if (fecha) filters.fecha = fecha;
     if (ruta) filters.ruta = { contains: ruta, mode: "insensitive" };
