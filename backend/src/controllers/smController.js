@@ -476,6 +476,21 @@ export const getHistoricoData = async (req, res, next) => {
     // Si hay filtro de rango de fechas, usar solo ese filtro
     // Si no hay filtro de rango, filtrar solo registros pasados
     if (fechaDesde || fechaHasta) {
+      // Parsear fechaDesde y fechaHasta como YYYY-MM-DD (format del HTML input date)
+      let desde = null, hasta = null;
+
+      if (fechaDesde) {
+        const [year, month, day] = fechaDesde.split('-').map(Number);
+        desde = new Date(year, month - 1, day); // month es 1-indexed en YYYY-MM-DD, 0-indexed en Date
+        desde.setHours(0, 0, 0, 0);
+      }
+
+      if (fechaHasta) {
+        const [year, month, day] = fechaHasta.split('-').map(Number);
+        hasta = new Date(year, month - 1, day);
+        hasta.setHours(23, 59, 59, 999);
+      }
+
       historicalDetails = allDetails.filter(d => {
         const detalleFecha = parseFechaString(d.fecha);
         if (!detalleFecha) return false;
@@ -483,15 +498,8 @@ export const getHistoricoData = async (req, res, next) => {
         // Normalizar detalleFecha a medianoche para comparación correcta
         detalleFecha.setHours(0, 0, 0, 0);
 
-        if (fechaDesde) {
-          const desde = new Date(fechaDesde + 'T00:00:00');
-          if (detalleFecha < desde) return false;
-        }
-
-        if (fechaHasta) {
-          const hasta = new Date(fechaHasta + 'T23:59:59');
-          if (detalleFecha > hasta) return false;
-        }
+        if (desde && detalleFecha < desde) return false;
+        if (hasta && detalleFecha > hasta) return false;
 
         return true;
       });
@@ -563,6 +571,21 @@ export const exportHistoricoExcel = async (req, res, next) => {
     // Si hay filtro de rango de fechas, usar solo ese filtro
     // Si no hay filtro de rango, filtrar solo registros pasados
     if (fechaDesde || fechaHasta) {
+      // Parsear fechaDesde y fechaHasta como YYYY-MM-DD (format del HTML input date)
+      let desde = null, hasta = null;
+
+      if (fechaDesde) {
+        const [year, month, day] = fechaDesde.split('-').map(Number);
+        desde = new Date(year, month - 1, day); // month es 1-indexed en YYYY-MM-DD, 0-indexed en Date
+        desde.setHours(0, 0, 0, 0);
+      }
+
+      if (fechaHasta) {
+        const [year, month, day] = fechaHasta.split('-').map(Number);
+        hasta = new Date(year, month - 1, day);
+        hasta.setHours(23, 59, 59, 999);
+      }
+
       historicalDetails = allDetails.filter(d => {
         const detalleFecha = parseFechaString(d.fecha);
         if (!detalleFecha) return false;
@@ -570,15 +593,8 @@ export const exportHistoricoExcel = async (req, res, next) => {
         // Normalizar detalleFecha a medianoche para comparación correcta
         detalleFecha.setHours(0, 0, 0, 0);
 
-        if (fechaDesde) {
-          const desde = new Date(fechaDesde + 'T00:00:00');
-          if (detalleFecha < desde) return false;
-        }
-
-        if (fechaHasta) {
-          const hasta = new Date(fechaHasta + 'T23:59:59');
-          if (detalleFecha > hasta) return false;
-        }
+        if (desde && detalleFecha < desde) return false;
+        if (hasta && detalleFecha > hasta) return false;
 
         return true;
       });
