@@ -200,7 +200,7 @@ model SMDetail {
   yogurt Int @default(0)
   quesos Int @default(0)
   totalGeneral Int @default(0)
-  numCarga String @unique // Clave única
+  numCarga String // Código de vehículo/transporte (NO único, puede haber múltiples entregas)
   ordenCompra String?
   createdAt DateTime @default(now())
   @@index([smUploadId])

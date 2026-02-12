@@ -219,24 +219,8 @@ export const uploadSMFile = async (req, res, next) => {
       });
     }
 
-    // Verificar duplicados de # CARGA
-    const cargaNumbers = processedData.map(d => d["# CARGA"]);
-    const duplicateCarga = new Set();
-
-    for (const carga of cargaNumbers) {
-      const existingCarga = await prisma.sMDetail.findFirst({
-        where: { numCarga: carga },
-      });
-      if (existingCarga) {
-        duplicateCarga.add(carga);
-      }
-    }
-
-    if (duplicateCarga.size > 0) {
-      return res.status(409).json({
-        error: `El(los) siguiente(s) número(s) de carga ya existe(n) en el sistema: ${Array.from(duplicateCarga).join(", ")}`,
-      });
-    }
+    // No hay validación de duplicados - numCarga es el código de vehículo que puede llevar múltiples entregas
+    console.log(`✅ Validación completada, listo para guardar ${processedData.length} registros`);
 
     // Crear el registro de upload
     try {
