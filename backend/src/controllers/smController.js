@@ -245,7 +245,7 @@ export const uploadSMFile = async (req, res, next) => {
       const smUpload = await prisma.sMUpload.create({
         data: {
           fileName,
-          companyId: req.user.companyId || "default-company",
+          companyId: req.user.companyId || null,
           uploadedById: req.user.id,
           status: "completed",
           totalRecords: processedData.length,

@@ -170,8 +170,8 @@ model FileUpload {
 
 model SMUpload {
   id String @id @default(cuid())
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId String
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  companyId String?
   fileName String
   uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
   uploadedById String?
