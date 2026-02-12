@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Zap, ChevronDown, ChevronUp, Filter, Truck } from 'lucide-react'
+import { Zap, ChevronDown, ChevronUp, Filter, Truck, Check, AlertCircle, XCircle, Loader } from 'lucide-react'
 import { smApi } from '../services/smApi'
+import { deliveryStatusApi } from '../services/deliveryStatusApi'
 
 export default function TraficoPage() {
   const [data, setData] = useState([])
@@ -9,6 +10,9 @@ export default function TraficoPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [expandedCarga, setExpandedCarga] = useState(null)
+  const [deliveryStatuses, setDeliveryStatuses] = useState([])
+  const [entregaStatuses, setEntregaStatuses] = useState({}) // { entregaId: { id, status, ... } }
+  const [updatingEntrega, setUpdatingEntrega] = useState(null)
 
   // Filtros
   const [filters, setFilters] = useState({
@@ -19,8 +23,18 @@ export default function TraficoPage() {
   })
 
   useEffect(() => {
+    loadDeliveryStatuses()
     loadTraficoData()
   }, [page, filters])
+
+  const loadDeliveryStatuses = async () => {
+    try {
+      const statuses = await deliveryStatusApi.getDeliveryStatuses()
+      setDeliveryStatuses(statuses)
+    } catch (err) {
+      console.error('Error cargando estados de entrega:', err)
+    }
+  }
 
   const loadTraficoData = async () => {
     try {
@@ -47,6 +61,57 @@ export default function TraficoPage() {
       [field]: value
     }))
     setPage(1)
+  }
+
+  const loadEntregaStatus = async (entregaId) => {
+    try {
+      const status = await deliveryStatusApi.getEntregaStatus(entregaId)
+      setEntregaStatuses(prev => ({
+        ...prev,
+        [entregaId]: status
+      }))
+    } catch (err) {
+      console.error('Error cargando estado de entrega:', err)
+    }
+  }
+
+  const handleUpdateEntregaStatus = async (entregaId, statusId) => {
+    setUpdatingEntrega(entregaId)
+    try {
+      await deliveryStatusApi.updateEntregaStatus(entregaId, statusId)
+      await loadEntregaStatus(entregaId)
+    } catch (err) {
+      console.error('Error actualizando estado:', err)
+      alert('Error al actualizar estado de entrega')
+    } finally {
+      setUpdatingEntrega(null)
+    }
+  }
+
+  const getStatusIcon = (statusNombre) => {
+    switch (statusNombre?.toUpperCase()) {
+      case 'EXITOSA':
+        return <Check className="w-4 h-4 text-green-600" />
+      case 'PARCIAL':
+        return <AlertCircle className="w-4 h-4 text-orange-600" />
+      case 'NO EXITOSA':
+        return <XCircle className="w-4 h-4 text-red-600" />
+      default:
+        return null
+    }
+  }
+
+  const getStatusColor = (statusNombre) => {
+    switch (statusNombre?.toUpperCase()) {
+      case 'EXITOSA':
+        return 'bg-green-100 text-green-800 border-green-300'
+      case 'PARCIAL':
+        return 'bg-orange-100 text-orange-800 border-orange-300'
+      case 'NO EXITOSA':
+        return 'bg-red-100 text-red-800 border-red-300'
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300'
+    }
   }
 
   // Agrupar por numCarga
@@ -163,7 +228,18 @@ export default function TraficoPage() {
               <div key={carga.numCarga} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 {/* Header de carga */}
                 <button
-                  onClick={() => setExpandedCarga(expandedCarga === carga.numCarga ? null : carga.numCarga)}
+                  onClick={() => {
+                    const isExpanding = expandedCarga !== carga.numCarga
+                    setExpandedCarga(isExpanding ? carga.numCarga : null)
+                    // Cargar estados de entregas cuando se expande
+                    if (isExpanding) {
+                      carga.entregas.forEach(entrega => {
+                        if (!entregaStatuses[entrega.id]) {
+                          loadEntregaStatus(entrega.id)
+                        }
+                      })
+                    }
+                  }}
                   className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center gap-3 flex-1 text-left">
@@ -226,6 +302,42 @@ export default function TraficoPage() {
                                 <p className="text-gray-900">{entrega.ordenCompra}</p>
                               </div>
                             )}
+                          </div>
+
+                          {/* Estado de entrega - Selector */}
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <p className="text-xs text-gray-600 font-semibold mb-2">Estado de Entrega</p>
+                            <div className="flex items-center gap-2">
+                              {updatingEntrega === entrega.id ? (
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                  <Loader className="w-4 h-4 animate-spin" />
+                                  Actualizando...
+                                </div>
+                              ) : (
+                                <>
+                                  {entregaStatuses[entrega.id]?.status ? (
+                                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(entregaStatuses[entrega.id].status.nombre)}`}>
+                                      {getStatusIcon(entregaStatuses[entrega.id].status.nombre)}
+                                      {entregaStatuses[entrega.id].status.nombre}
+                                    </span>
+                                  ) : (
+                                    <span className="text-sm text-gray-500">Sin estado asignado</span>
+                                  )}
+                                  <select
+                                    onChange={(e) => handleUpdateEntregaStatus(entrega.id, e.target.value)}
+                                    defaultValue=""
+                                    className="px-3 py-1 text-sm border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  >
+                                    <option value="">Cambiar estado...</option>
+                                    {deliveryStatuses.map((status) => (
+                                      <option key={status.id} value={status.id}>
+                                        {status.nombre}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
