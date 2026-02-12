@@ -126,24 +126,34 @@ export const getSMDetails = async (req, res, next) => {
 // Process and upload SM Excel file
 export const uploadSMFile = async (req, res, next) => {
   try {
+    console.log("📁 Iniciando upload de archivo SM...");
+
     if (!req.file) {
+      console.error("❌ No file provided");
       return res.status(400).json({ error: "No file provided" });
     }
 
     const fileName = req.file.originalname;
     const buffer = req.file.buffer;
 
+    console.log(`📄 Archivo: ${fileName}, Tamaño: ${buffer.length} bytes`);
+
     // Leer el archivo Excel
     let workbook;
     try {
+      console.log("📖 Leyendo Excel...");
       workbook = XLSX.read(buffer, { type: "buffer" });
+      console.log(`✅ Excel leído, hojas encontradas: ${workbook.SheetNames.length}`);
     } catch (error) {
+      console.error("❌ Error al leer Excel:", error.message);
       return res.status(400).json({ error: "Formato de archivo inválido. Debe ser un Excel válido." });
     }
 
     // Obtener la primera hoja
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
+
+    console.log(`📋 Hoja seleccionada: ${sheetName}`);
 
     // Convertir a JSON (con encabezados)
     const data = [];
@@ -230,53 +240,65 @@ export const uploadSMFile = async (req, res, next) => {
     }
 
     // Crear el registro de upload
-    const smUpload = await prisma.sMUpload.create({
-      data: {
-        fileName,
-        companyId: req.user.companyId,
-        uploadedById: req.user.id,
-        status: "completed",
-        totalRecords: processedData.length,
-        details: {
-          createMany: {
-            data: processedData.map(detail => ({
-              fecha: detail.FECHA,
-              ruta: detail.RUTA,
-              ciudad: detail.CIUDAD,
-              cargas: detail.CARGAS,
-              nombreCliente: detail.NOMBRE_CLIENTE,
-              codCliente: detail.COD_CLIENTE,
-              secuencia: detail.SECUENCIA,
-              alqueria: detail.Alquería,
-              yogurt: detail.Yogurt,
-              quesos: detail.Quesos,
-              totalGeneral: detail["Total general"],
-              numCarga: detail["# CARGA"],
-              ordenCompra: detail["ORDEN DE COMBRA"] || null,
-            })),
+    try {
+      console.log(`📊 Guardando ${processedData.length} registros en BD...`);
+
+      const smUpload = await prisma.sMUpload.create({
+        data: {
+          fileName,
+          companyId: req.user.companyId,
+          uploadedById: req.user.id,
+          status: "completed",
+          totalRecords: processedData.length,
+          details: {
+            createMany: {
+              data: processedData.map(detail => ({
+                fecha: detail.FECHA,
+                ruta: detail.RUTA,
+                ciudad: detail.CIUDAD,
+                cargas: detail.CARGAS,
+                nombreCliente: detail.NOMBRE_CLIENTE,
+                codCliente: detail.COD_CLIENTE,
+                secuencia: detail.SECUENCIA,
+                alqueria: detail.Alquería,
+                yogurt: detail.Yogurt,
+                quesos: detail.Quesos,
+                totalGeneral: detail["Total general"],
+                numCarga: detail["# CARGA"],
+                ordenCompra: detail["ORDEN DE COMBRA"] || null,
+              })),
+            },
           },
         },
-      },
-      select: {
-        id: true,
-        fileName: true,
-        status: true,
-        totalRecords: true,
-        createdAt: true,
-      },
-    });
-
-    res.status(201).json({
-      message: "Archivo procesado exitosamente",
-      upload: smUpload,
-    });
-  } catch (error) {
-    // Si es error de duplicado
-    if (error.code === "P2002") {
-      return res.status(409).json({
-        error: "El número de carga ya existe en el sistema",
+        select: {
+          id: true,
+          fileName: true,
+          status: true,
+          totalRecords: true,
+          createdAt: true,
+        },
       });
+
+      console.log(`✅ Archivo procesado exitosamente: ${smUpload.id}`);
+
+      res.status(201).json({
+        message: "Archivo procesado exitosamente",
+        upload: smUpload,
+      });
+    } catch (dbError) {
+      console.error("❌ Error en BD:", dbError);
+
+      // Si es error de duplicado
+      if (dbError.code === "P2002") {
+        return res.status(409).json({
+          error: "El número de carga ya existe en el sistema",
+        });
+      }
+
+      throw dbError;
     }
+  } catch (error) {
+    console.error("❌ Error general:", error);
     next(error);
   }
 };
