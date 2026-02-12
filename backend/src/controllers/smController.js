@@ -219,7 +219,27 @@ export const uploadSMFile = async (req, res, next) => {
       });
     }
 
-    // No hay validación de duplicados - numCarga es el código de vehículo que puede llevar múltiples entregas
+    // Verificar que los numCarga del archivo NUEVO no existan en uploads anteriores
+    console.log(`🔍 Verificando que numCarga no existan en BD...`);
+    const cargaNumbers = [...new Set(processedData.map(d => d["# CARGA"]))]; // Números únicos en el archivo
+    const existingCargas = [];
+
+    for (const carga of cargaNumbers) {
+      const existingRecord = await prisma.sMDetail.findFirst({
+        where: { numCarga: carga },
+      });
+      if (existingRecord) {
+        existingCargas.push(carga);
+      }
+    }
+
+    if (existingCargas.length > 0) {
+      console.error(`❌ Cargas duplicadas encontradas: ${existingCargas.join(", ")}`);
+      return res.status(409).json({
+        error: `Los siguientes números de carga ya existen en el sistema (fueron subidos anteriormente): ${existingCargas.join(", ")}. No se puede subir el mismo archivo dos veces.`,
+      });
+    }
+
     console.log(`✅ Validación completada, listo para guardar ${processedData.length} registros`);
 
     // Crear el registro de upload
