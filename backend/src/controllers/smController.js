@@ -470,29 +470,34 @@ export const getHistoricoData = async (req, res, next) => {
       orderBy: { fecha: "desc" },
     });
 
-    // Filtrar solo registros PASADOS
-    let historicalDetails = allDetails.filter(d => isFechaPast(d.fecha));
+    // Filtrar solo registros PASADOS o en el rango especificado
+    let historicalDetails = allDetails;
 
-    // Filtrar por rango de fechas si se proporciona
+    // Si hay filtro de rango de fechas, usar solo ese filtro
+    // Si no hay filtro de rango, filtrar solo registros pasados
     if (fechaDesde || fechaHasta) {
-      historicalDetails = historicalDetails.filter(d => {
+      historicalDetails = allDetails.filter(d => {
         const detalleFecha = parseFechaString(d.fecha);
         if (!detalleFecha) return false;
 
+        // Normalizar detalleFecha a medianoche para comparación correcta
+        detalleFecha.setHours(0, 0, 0, 0);
+
         if (fechaDesde) {
-          const desde = new Date(fechaDesde);
-          desde.setHours(0, 0, 0, 0);
+          const desde = new Date(fechaDesde + 'T00:00:00');
           if (detalleFecha < desde) return false;
         }
 
         if (fechaHasta) {
-          const hasta = new Date(fechaHasta);
-          hasta.setHours(23, 59, 59, 999);
+          const hasta = new Date(fechaHasta + 'T23:59:59');
           if (detalleFecha > hasta) return false;
         }
 
         return true;
       });
+    } else {
+      // Si no hay rango especificado, filtrar solo registros PASADOS
+      historicalDetails = allDetails.filter(d => isFechaPast(d.fecha));
     }
 
     // Aplicar paginación
@@ -552,29 +557,34 @@ export const exportHistoricoExcel = async (req, res, next) => {
       orderBy: { fecha: "desc" },
     });
 
-    // Filtrar solo registros PASADOS
-    let historicalDetails = allDetails.filter(d => isFechaPast(d.fecha));
+    // Filtrar solo registros PASADOS o en el rango especificado
+    let historicalDetails = allDetails;
 
-    // Filtrar por rango de fechas si se proporciona
+    // Si hay filtro de rango de fechas, usar solo ese filtro
+    // Si no hay filtro de rango, filtrar solo registros pasados
     if (fechaDesde || fechaHasta) {
-      historicalDetails = historicalDetails.filter(d => {
+      historicalDetails = allDetails.filter(d => {
         const detalleFecha = parseFechaString(d.fecha);
         if (!detalleFecha) return false;
 
+        // Normalizar detalleFecha a medianoche para comparación correcta
+        detalleFecha.setHours(0, 0, 0, 0);
+
         if (fechaDesde) {
-          const desde = new Date(fechaDesde);
-          desde.setHours(0, 0, 0, 0);
+          const desde = new Date(fechaDesde + 'T00:00:00');
           if (detalleFecha < desde) return false;
         }
 
         if (fechaHasta) {
-          const hasta = new Date(fechaHasta);
-          hasta.setHours(23, 59, 59, 999);
+          const hasta = new Date(fechaHasta + 'T23:59:59');
           if (detalleFecha > hasta) return false;
         }
 
         return true;
       });
+    } else {
+      // Si no hay rango especificado, filtrar solo registros PASADOS
+      historicalDetails = allDetails.filter(d => isFechaPast(d.fecha));
     }
 
     // Preparar datos para Excel
