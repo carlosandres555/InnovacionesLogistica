@@ -183,7 +183,7 @@ export default function TraficoPage() {
                     <div className="divide-y divide-gray-200">
                       {carga.entregas.map((entrega) => (
                         <div key={entrega.id} className="px-6 py-4 hover:bg-gray-100">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                             <div>
                               <p className="text-xs text-gray-600 font-semibold">Cliente</p>
                               <p className="text-gray-900">{entrega.nombreCliente}</p>
@@ -193,8 +193,12 @@ export default function TraficoPage() {
                               <p className="text-gray-900">{entrega.ruta} - {entrega.ciudad}</p>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-600 font-semibold">Secuencia / Cód. Cliente</p>
-                              <p className="text-gray-900">{entrega.secuencia} / {entrega.codCliente}</p>
+                              <p className="text-xs text-gray-600 font-semibold">Cód. Cliente</p>
+                              <p className="text-gray-900">{entrega.codCliente}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600 font-semibold">Secuencia</p>
+                              <p className="text-gray-900">{entrega.secuencia}</p>
                             </div>
                             <div>
                               <p className="text-xs text-gray-600 font-semibold">Productos</p>
