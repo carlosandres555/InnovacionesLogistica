@@ -5,6 +5,9 @@ import { usersApi } from '../services/usersApi'
 import UserFormModal from '../components/UserFormModal'
 import ResetPasswordModal from '../components/ResetPasswordModal'
 import ConfirmDialog from '../components/ConfirmDialog'
+import Button from '../components/Button'
+import Input from '../components/Input'
+import Card from '../components/Card'
 
 export default function UsersPage() {
   const queryClient = useQueryClient()
@@ -101,26 +104,27 @@ export default function UsersPage() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in-up">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent mb-1">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-1">
             Gestión de Usuarios
           </h1>
           <p className="text-gray-600 text-sm">Administra los usuarios del sistema</p>
         </div>
-        <button
+        <Button
           onClick={handleCreateClick}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-400 hover:from-red-500 hover:to-red-300 text-white px-6 py-3 rounded-xl transition-all duration-300 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-red-900/50"
+          size="lg"
+          className="w-full sm:w-auto gap-2"
         >
           <Plus className="w-5 h-5" />
           Crear Usuario
-        </button>
+        </Button>
       </div>
 
       {/* Search Card */}
-      <div className="relative overflow-hidden rounded-2xl bg-white border-2 border-red-500/20 p-6 shadow-lg">
+      <Card>
         <div className="relative">
-          <Search className="absolute left-4 top-4 w-5 h-5 text-red-500" />
+          <Search className="absolute left-4 top-3 w-5 h-5 text-gray-400" />
           <input
             type="text"
             placeholder="Buscar por nombre, apellido o email..."
@@ -129,10 +133,10 @@ export default function UsersPage() {
               setSearch(e.target.value)
               setPage(1)
             }}
-            className="w-full pl-12 pr-4 py-3 text-sm bg-gray-50 border border-red-500/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition text-gray-900 placeholder-gray-400"
+            className="w-full pl-12 pr-4 py-2.5 text-base bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition text-gray-900 placeholder-gray-400"
           />
         </div>
-      </div>
+      </Card>
 
       {/* Error */}
       {error && (
@@ -145,7 +149,7 @@ export default function UsersPage() {
       )}
 
       {/* Table Container */}
-      <div className="relative overflow-hidden rounded-2xl bg-white border-2 border-red-500/20 shadow-lg">
+      <Card noPadding>
         {/* Table */}
         {isLoading ? (
           <div className="p-12 text-center text-gray-500 text-sm">
@@ -362,7 +366,7 @@ export default function UsersPage() {
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Modals */}
       <UserFormModal

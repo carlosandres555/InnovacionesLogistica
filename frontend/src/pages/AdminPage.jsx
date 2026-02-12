@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { Settings, Plus, Trash2, AlertCircle, Loader, ChevronDown, ChevronUp, Shield, Save } from 'lucide-react'
 import { deliveryStatusApi } from '../services/deliveryStatusApi'
 import { rolesApi } from '../services/rolesApi'
+import Button from '../components/Button'
+import Input from '../components/Input'
+import Card from '../components/Card'
 
 // Módulos disponibles
 const ALL_MODULES = [
@@ -281,11 +284,11 @@ export default function AdminPage() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent mb-2">
+      <div className="animate-fade-in-up">
+        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-2">
           Administración
         </h1>
-        <p className="text-gray-600">Gestiona los estados de entrega</p>
+        <p className="text-gray-600">Gestiona los estados de entrega y permisos</p>
       </div>
 
       {/* Mensajes */}
@@ -304,38 +307,35 @@ export default function AdminPage() {
       )}
 
       {/* Sección: Estados Actuales */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <Card>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Estados de Entrega</h2>
-          <button
+          <h2 className="text-xl font-bold text-slate-900">Estados de Entrega</h2>
+          <Button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+            size="md"
+            className="gap-2"
           >
             <Plus className="w-5 h-5" />
             Nuevo Estado
-          </button>
+          </Button>
         </div>
 
         {/* Formulario de creación */}
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-gray-50 rounded-lg p-6 mb-6 space-y-4 border border-gray-200">
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Nombre del Estado *
-              </label>
-              <input
-                type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleInputChange}
-                placeholder="ej: ENTREGADO, EN TRÁNSITO, etc."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled={submitting}
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="bg-gray-50 rounded-lg p-6 mb-6 space-y-4 border border-gray-200 animate-slide-in-left">
+            <Input
+              label="Nombre del Estado"
+              type="text"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleInputChange}
+              placeholder="ej: ENTREGADO, EN TRÁNSITO, etc."
+              disabled={submitting}
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
                 Descripción
               </label>
               <textarea
@@ -344,20 +344,20 @@ export default function AdminPage() {
                 onChange={handleInputChange}
                 placeholder="Descripción del estado (opcional)"
                 rows="3"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 resize-none"
                 disabled={submitting}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
                 Color
               </label>
               <select
                 name="color"
                 value={formData.color}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-white"
                 disabled={submitting}
               >
                 {colorOptions.map(option => (
@@ -369,30 +369,22 @@ export default function AdminPage() {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <button
+              <Button
                 type="submit"
                 disabled={submitting}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+                loading={submitting}
+                variant="success"
               >
-                {submitting ? (
-                  <>
-                    <Loader className="w-4 h-4 animate-spin" />
-                    Creando...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4" />
-                    Crear Estado
-                  </>
-                )}
-              </button>
-              <button
+                <Plus className="w-4 h-4" />
+                {!submitting && 'Crear Estado'}
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-2 px-6 rounded-lg transition-colors"
+                variant="secondary"
               >
                 Cancelar
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -575,7 +567,7 @@ export default function AdminPage() {
             ))}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Información */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -589,10 +581,10 @@ export default function AdminPage() {
       </div>
 
       {/* SECCIÓN: Configuración de Roles y Permisos */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <Card>
         <div className="flex items-center gap-2 mb-6">
-          <Shield className="w-6 h-6 text-red-500" />
-          <h2 className="text-xl font-bold text-gray-900">Roles y Permisos</h2>
+          <Shield className="w-6 h-6 text-blue-600" />
+          <h2 className="text-xl font-bold text-slate-900">Roles y Permisos</h2>
         </div>
 
         <p className="text-gray-600 text-sm mb-6">
@@ -702,7 +694,7 @@ export default function AdminPage() {
             <li><strong>4. El usuario obtiene automáticamente los módulos del nuevo rol</strong> en el próximo login</li>
           </ol>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }
