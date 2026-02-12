@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage'
 import UsersPage from './pages/UsersPage'
 import TraficoPage from './pages/TraficoPage'
 import CargaInformacionPage from './pages/CargaInformacionPage'
+import AdminPage from './pages/AdminPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Components
@@ -67,6 +68,17 @@ function App() {
               <ProtectedRoute isAuthenticated={isAuthenticated}>
                 <Layout>
                   <CargaInformacionPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} requiredRole="ADMIN">
+                <Layout>
+                  <AdminPage />
                 </Layout>
               </ProtectedRoute>
             }
