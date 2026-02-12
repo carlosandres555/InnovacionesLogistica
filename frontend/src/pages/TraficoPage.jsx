@@ -266,8 +266,18 @@ export default function TraficoPage() {
               <div key={carga.numCarga} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 {/* Header de carga */}
                 <button
-                  onClick={() => {
-                    setExpandedCarga(expandedCarga === carga.numCarga ? null : carga.numCarga)
+                  onClick={async () => {
+                    const isExpanding = expandedCarga !== carga.numCarga
+                    setExpandedCarga(isExpanding ? carga.numCarga : null)
+
+                    // Cargar estados de todas las entregas de esta ruta cuando se expande
+                    if (isExpanding) {
+                      for (const entrega of carga.entregas) {
+                        if (!entregaStatuses[entrega.id]) {
+                          await loadEntregaStatus(entrega.id)
+                        }
+                      }
+                    }
                   }}
                   className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
@@ -366,25 +376,22 @@ export default function TraficoPage() {
                             ) : (
                               <>
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                                  {entrega.deliveryStatus?.id ? (
+                                  {entregaStatuses[entrega.id]?.status ? (
+                                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(entregaStatuses[entrega.id].status.nombre)}`}>
+                                      {getStatusIcon(entregaStatuses[entrega.id].status.nombre)}
+                                      {entregaStatuses[entrega.id].status.nombre}
+                                    </span>
+                                  ) : entrega.deliveryStatus?.id ? (
                                     <span className="text-sm text-gray-600">
-                                      ✓ Asignado
+                                      ✓ Cargando...
                                     </span>
                                   ) : (
                                     <span className="text-sm text-gray-500">Sin estado</span>
                                   )}
                                 </div>
                                 <button
-                                  onClick={async () => {
+                                  onClick={() => {
                                     setSelectedEntrega(entrega)
-                                    // Cargar el estado completo solo cuando hace click
-                                    if (entrega.deliveryStatus?.id) {
-                                      const status = await deliveryStatusApi.getEntregaStatus(entrega.id)
-                                      setEntregaStatuses(prev => ({
-                                        ...prev,
-                                        [entrega.id]: status
-                                      }))
-                                    }
                                     setModalOpen(true)
                                   }}
                                   className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 cursor-pointer transition-colors"
