@@ -13,7 +13,8 @@ export default function HistoricoRuteroPage() {
 
   // Filtros
   const [filters, setFilters] = useState({
-    fecha: '',
+    fechaDesde: '',
+    fechaHasta: '',
     numCarga: '',
     codCliente: '',
     nombreCliente: ''
@@ -146,16 +147,28 @@ export default function HistoricoRuteroPage() {
           <h3 className="font-semibold text-gray-900">Filtros</h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* Rango de Fechas */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fecha
+              Desde
             </label>
             <input
-              type="text"
-              placeholder="ej: 11-Feb"
-              value={filters.fecha}
-              onChange={(e) => handleFilterChange('fecha', e.target.value)}
+              type="date"
+              value={filters.fechaDesde}
+              onChange={(e) => handleFilterChange('fechaDesde', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Hasta
+            </label>
+            <input
+              type="date"
+              value={filters.fechaHasta}
+              onChange={(e) => handleFilterChange('fechaHasta', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>

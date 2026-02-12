@@ -422,7 +422,7 @@ export const getTraficoData = async (req, res, next) => {
 // Get historical SM details (only past records - read-only)
 export const getHistoricoData = async (req, res, next) => {
   try {
-    const { fecha, numCarga, codCliente, nombreCliente, page = 1, limit = 100 } = req.query;
+    const { fechaDesde, fechaHasta, numCarga, codCliente, nombreCliente, page = 1, limit = 100 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Construir filtros
@@ -473,9 +473,26 @@ export const getHistoricoData = async (req, res, next) => {
     // Filtrar solo registros PASADOS
     let historicalDetails = allDetails.filter(d => isFechaPast(d.fecha));
 
-    // Filtrar por fecha si se proporciona
-    if (fecha) {
-      historicalDetails = historicalDetails.filter(d => d.fecha.includes(fecha));
+    // Filtrar por rango de fechas si se proporciona
+    if (fechaDesde || fechaHasta) {
+      historicalDetails = historicalDetails.filter(d => {
+        const detalleFecha = parseFechaString(d.fecha);
+        if (!detalleFecha) return false;
+
+        if (fechaDesde) {
+          const desde = new Date(fechaDesde);
+          desde.setHours(0, 0, 0, 0);
+          if (detalleFecha < desde) return false;
+        }
+
+        if (fechaHasta) {
+          const hasta = new Date(fechaHasta);
+          hasta.setHours(23, 59, 59, 999);
+          if (detalleFecha > hasta) return false;
+        }
+
+        return true;
+      });
     }
 
     // Aplicar paginación
@@ -498,7 +515,7 @@ export const getHistoricoData = async (req, res, next) => {
 // Export historical data to Excel
 export const exportHistoricoExcel = async (req, res, next) => {
   try {
-    const { fecha, numCarga, codCliente, nombreCliente } = req.query;
+    const { fechaDesde, fechaHasta, numCarga, codCliente, nombreCliente } = req.query;
 
     // Construir filtros
     const filters = {};
@@ -538,9 +555,26 @@ export const exportHistoricoExcel = async (req, res, next) => {
     // Filtrar solo registros PASADOS
     let historicalDetails = allDetails.filter(d => isFechaPast(d.fecha));
 
-    // Filtrar por fecha si se proporciona
-    if (fecha) {
-      historicalDetails = historicalDetails.filter(d => d.fecha.includes(fecha));
+    // Filtrar por rango de fechas si se proporciona
+    if (fechaDesde || fechaHasta) {
+      historicalDetails = historicalDetails.filter(d => {
+        const detalleFecha = parseFechaString(d.fecha);
+        if (!detalleFecha) return false;
+
+        if (fechaDesde) {
+          const desde = new Date(fechaDesde);
+          desde.setHours(0, 0, 0, 0);
+          if (detalleFecha < desde) return false;
+        }
+
+        if (fechaHasta) {
+          const hasta = new Date(fechaHasta);
+          hasta.setHours(23, 59, 59, 999);
+          if (detalleFecha > hasta) return false;
+        }
+
+        return true;
+      });
     }
 
     // Preparar datos para Excel
