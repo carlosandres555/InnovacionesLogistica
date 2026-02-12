@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { readFile } from 'xlsx';
+import XLSX from 'xlsx';
 import { z } from "zod";
 
 const prisma = new PrismaClient();
@@ -136,7 +136,7 @@ export const uploadSMFile = async (req, res, next) => {
     // Leer el archivo Excel
     let workbook;
     try {
-      workbook = readFile(buffer, { type: "buffer" });
+      workbook = XLSX.read(buffer, { type: "buffer" });
     } catch (error) {
       return res.status(400).json({ error: "Formato de archivo inválido. Debe ser un Excel válido." });
     }
@@ -155,10 +155,18 @@ export const uploadSMFile = async (req, res, next) => {
       const cellA = worksheet[`A${i}`];
       if (!cellA || !cellA.v) break;
 
+      const ruta = worksheet[`B${i}`]?.v?.toString() || "";
+      const ciudad = worksheet[`C${i}`]?.v?.toString() || "";
+
+      // Saltar filas de totales (que contienen "Total" en RUTA o CIUDAD vacío)
+      if (ruta.toLowerCase().includes("total") || !ciudad) {
+        continue;
+      }
+
       const rowData = {
         FECHA: worksheet[`A${i}`]?.v?.toString() || "",
-        RUTA: worksheet[`B${i}`]?.v?.toString() || "",
-        CIUDAD: worksheet[`C${i}`]?.v?.toString() || "",
+        RUTA: ruta,
+        CIUDAD: ciudad,
         CARGAS: worksheet[`D${i}`]?.v?.toString() || "",
         NOMBRE_CLIENTE: worksheet[`E${i}`]?.v?.toString() || "",
         COD_CLIENTE: worksheet[`F${i}`]?.v?.toString() || "",
