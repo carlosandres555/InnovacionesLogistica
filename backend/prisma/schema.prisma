@@ -241,6 +241,7 @@ model EntregaDeliveryStatus {
   reason DeliveryStatusReason? @relation(fields: [reasonId], references: [id], onDelete: SetNull)
   reasonId String?
   observaciones String?
+  recogioDevoluccion Boolean @default(false) // Indica si recogió devolución
   updatedBy User? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
   updatedById String?
   updatedAt DateTime @updatedAt

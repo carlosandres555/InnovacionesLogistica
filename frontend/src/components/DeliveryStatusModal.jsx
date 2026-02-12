@@ -13,6 +13,7 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
     statusId: '',
     reasonId: '',
     observaciones: '',
+    recogioDevoluccion: false,
   })
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
           statusId: currentStatus.status?.id || '',
           reasonId: currentStatus.reason?.id || '',
           observaciones: currentStatus.observaciones || '',
+          recogioDevoluccion: currentStatus.recogioDevoluccion || false,
         })
 
         // Load reasons for current status
@@ -100,7 +102,8 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
         entrega.id,
         formData.statusId,
         formData.reasonId || null,
-        formData.observaciones
+        formData.observaciones,
+        formData.recogioDevoluccion
       )
 
       onSave()
@@ -216,6 +219,27 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
                   disabled={submitting}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
+              </div>
+
+              {/* Recogió Devolución Checkbox */}
+              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <input
+                  type="checkbox"
+                  id="recogioDevoluccion"
+                  name="recogioDevoluccion"
+                  checked={formData.recogioDevoluccion}
+                  onChange={(e) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      recogioDevoluccion: e.target.checked
+                    }))
+                  }}
+                  disabled={submitting}
+                  className="w-5 h-5 text-blue-600 rounded cursor-pointer"
+                />
+                <label htmlFor="recogioDevoluccion" className="text-sm font-semibold text-gray-900 cursor-pointer">
+                  ✓ Recogió Devolución
+                </label>
               </div>
             </>
           )}

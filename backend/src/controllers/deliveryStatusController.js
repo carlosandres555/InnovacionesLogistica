@@ -146,7 +146,7 @@ export const createDeliveryStatusReason = async (req, res, next) => {
 export const updateEntregaDeliveryStatus = async (req, res, next) => {
   try {
     const { entregaId } = req.params;
-    const { statusId, reasonId, observaciones } = req.body;
+    const { statusId, reasonId, observaciones, recogioDevoluccion } = req.body;
 
     if (!statusId) {
       return res.status(400).json({ error: "statusId es requerido" });
@@ -188,6 +188,7 @@ export const updateEntregaDeliveryStatus = async (req, res, next) => {
         statusId,
         reasonId: reasonId || null,
         observaciones,
+        recogioDevoluccion: recogioDevoluccion || false,
         updatedById: req.user.id,
         updatedAt: new Date(),
       },
@@ -196,6 +197,7 @@ export const updateEntregaDeliveryStatus = async (req, res, next) => {
         statusId,
         reasonId: reasonId || null,
         observaciones,
+        recogioDevoluccion: recogioDevoluccion || false,
         updatedById: req.user.id,
       },
       select: {
@@ -215,6 +217,7 @@ export const updateEntregaDeliveryStatus = async (req, res, next) => {
           },
         },
         observaciones: true,
+        recogioDevoluccion: true,
         updatedAt: true,
       },
     });
@@ -251,6 +254,7 @@ export const getEntregaDeliveryStatus = async (req, res, next) => {
           },
         },
         observaciones: true,
+        recogioDevoluccion: true,
         updatedAt: true,
         updatedBy: {
           select: {

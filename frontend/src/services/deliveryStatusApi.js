@@ -36,12 +36,13 @@ export const deliveryStatusApi = {
     }
   },
 
-  // Actualizar estado de una entrega (con motivo opcional)
-  updateEntregaStatus: async (entregaId, statusId, reasonId = null, observaciones = '') => {
+  // Actualizar estado de una entrega (con motivo opcional y devolución)
+  updateEntregaStatus: async (entregaId, statusId, reasonId = null, observaciones = '', recogioDevoluccion = false) => {
     const { data } = await axios.put(`${API_URL}/delivery-status/entrega/${entregaId}`, {
       statusId,
       reasonId,
       observaciones,
+      recogioDevoluccion,
     })
     return data
   },
