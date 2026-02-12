@@ -332,6 +332,11 @@ export const getTraficoData = async (req, res, next) => {
               createdAt: true,
             },
           },
+          deliveryStatus: {
+            select: {
+              id: true,
+            },
+          },
         },
         skip,
         take: parseInt(limit),

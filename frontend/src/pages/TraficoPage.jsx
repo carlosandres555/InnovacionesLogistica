@@ -28,7 +28,6 @@ export default function TraficoPage() {
 
   useEffect(() => {
     loadDeliveryStatuses()
-    setEntregaStatuses({}) // Limpiar estados previos
     loadTraficoData()
   }, [page, filters])
 
@@ -52,13 +51,6 @@ export default function TraficoPage() {
       setData(result.details)
       setTotalPages(result.pagination.pages)
       setError(null)
-
-      // Cargar estados de todas las entregas automáticamente
-      if (result.details && result.details.length > 0) {
-        result.details.forEach(entrega => {
-          loadEntregaStatus(entrega.id)
-        })
-      }
     } catch (err) {
       setError('Error al cargar datos de tráfico')
       console.error(err)
@@ -135,7 +127,7 @@ export default function TraficoPage() {
 
   const getProgressData = (entregas) => {
     const total = entregas.length
-    const asignadas = entregas.filter(e => entregaStatuses[e.id]?.status).length
+    const asignadas = entregas.filter(e => e.deliveryStatus?.id).length
     const porcentaje = total > 0 ? Math.round((asignadas / total) * 100) : 0
     return { total, asignadas, porcentaje }
   }
@@ -276,16 +268,7 @@ export default function TraficoPage() {
                 {/* Header de carga */}
                 <button
                   onClick={() => {
-                    const isExpanding = expandedCarga !== carga.numCarga
-                    setExpandedCarga(isExpanding ? carga.numCarga : null)
-                    // Cargar estados de entregas cuando se expande
-                    if (isExpanding) {
-                      carga.entregas.forEach(entrega => {
-                        if (!entregaStatuses[entrega.id]) {
-                          loadEntregaStatus(entrega.id)
-                        }
-                      })
-                    }
+                    setExpandedCarga(expandedCarga === carga.numCarga ? null : carga.numCarga)
                   }}
                   className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
@@ -384,18 +367,25 @@ export default function TraficoPage() {
                             ) : (
                               <>
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                                  {entregaStatuses[entrega.id]?.status ? (
-                                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(entregaStatuses[entrega.id].status.nombre)}`}>
-                                      {getStatusIcon(entregaStatuses[entrega.id].status.nombre)}
-                                      {entregaStatuses[entrega.id].status.nombre}
+                                  {entrega.deliveryStatus?.id ? (
+                                    <span className="text-sm text-gray-600">
+                                      ✓ Asignado
                                     </span>
                                   ) : (
                                     <span className="text-sm text-gray-500">Sin estado</span>
                                   )}
                                 </div>
                                 <button
-                                  onClick={() => {
+                                  onClick={async () => {
                                     setSelectedEntrega(entrega)
+                                    // Cargar el estado completo solo cuando hace click
+                                    if (entrega.deliveryStatus?.id) {
+                                      const status = await deliveryStatusApi.getEntregaStatus(entrega.id)
+                                      setEntregaStatuses(prev => ({
+                                        ...prev,
+                                        [entrega.id]: status
+                                      }))
+                                    }
                                     setModalOpen(true)
                                   }}
                                   className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 cursor-pointer transition-colors"
