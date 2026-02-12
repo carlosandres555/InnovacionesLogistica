@@ -321,7 +321,7 @@ export const getTraficoData = async (req, res, next) => {
     if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
     if (nombreCliente) filters.nombreCliente = { contains: nombreCliente, mode: "insensitive" };
 
-    const [details, total] = await Promise.all([
+    const [details, total, progressByRoute] = await Promise.all([
       prisma.sMDetail.findMany({
         where: filters,
         include: {
@@ -343,6 +343,37 @@ export const getTraficoData = async (req, res, next) => {
         orderBy: { fecha: "desc" },
       }),
       prisma.sMDetail.count({ where: filters }),
+      // Calcular progreso por numCarga
+      prisma.sMDetail.groupBy({
+        by: ["numCarga"],
+        where: filters,
+        _count: {
+          id: true,
+        },
+      }).then(async (groups) => {
+        const progressMap = {};
+
+        for (const group of groups) {
+          const withStatus = await prisma.sMDetail.count({
+            where: {
+              numCarga: group.numCarga,
+              ...filters,
+              deliveryStatus: {
+                isNot: null,
+              },
+            },
+          });
+
+          const total = group._count.id;
+          progressMap[group.numCarga] = {
+            total,
+            asignadas: withStatus,
+            porcentaje: total > 0 ? Math.round((withStatus / total) * 100) : 0,
+          };
+        }
+
+        return progressMap;
+      }),
     ]);
 
     res.json({
@@ -353,6 +384,7 @@ export const getTraficoData = async (req, res, next) => {
         total,
         pages: Math.ceil(total / parseInt(limit)),
       },
+      progressByRoute,
     });
   } catch (error) {
     next(error);

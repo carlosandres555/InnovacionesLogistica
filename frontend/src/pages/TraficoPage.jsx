@@ -16,6 +16,7 @@ export default function TraficoPage() {
   const [updatingEntrega, setUpdatingEntrega] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedEntrega, setSelectedEntrega] = useState(null)
+  const [progressByRoute, setProgressByRoute] = useState({})
 
   // Filtros
   const [filters, setFilters] = useState({
@@ -50,6 +51,7 @@ export default function TraficoPage() {
       })
       setData(result.details)
       setTotalPages(result.pagination.pages)
+      setProgressByRoute(result.progressByRoute || {})
       setError(null)
     } catch (err) {
       setError('Error al cargar datos de tráfico')
@@ -125,11 +127,8 @@ export default function TraficoPage() {
     }
   }
 
-  const getProgressData = (entregas) => {
-    const total = entregas.length
-    const asignadas = entregas.filter(e => e.deliveryStatus?.id).length
-    const porcentaje = total > 0 ? Math.round((asignadas / total) * 100) : 0
-    return { total, asignadas, porcentaje }
+  const getProgressData = (numCarga) => {
+    return progressByRoute[numCarga] || { total: 0, asignadas: 0, porcentaje: 0 }
   }
 
   const getProgressColor = (porcentaje) => {
@@ -299,7 +298,7 @@ export default function TraficoPage() {
 
                 {/* Barra de progreso de asignación */}
                 {(() => {
-                  const progress = getProgressData(carga.entregas)
+                  const progress = getProgressData(carga.numCarga)
                   return (
                     <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
                       <div className="flex items-center justify-between mb-2">
