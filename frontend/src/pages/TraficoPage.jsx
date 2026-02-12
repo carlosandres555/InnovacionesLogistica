@@ -282,71 +282,73 @@ export default function TraficoPage() {
                   <div className="border-t border-gray-200 bg-gray-50">
                     <div className="divide-y divide-gray-200">
                       {carga.entregas.map((entrega) => (
-                        <div key={entrega.id} className="px-6 py-4 hover:bg-gray-100">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                            <div>
-                              <p className="text-xs text-gray-600 font-semibold">Cliente</p>
-                              <p className="text-gray-900">{entrega.nombreCliente}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-600 font-semibold">Ruta / Ciudad</p>
-                              <p className="text-gray-900">{entrega.ruta} - {entrega.ciudad}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-600 font-semibold">Cód. Cliente</p>
-                              <p className="text-gray-900">{entrega.codCliente}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-600 font-semibold">Secuencia</p>
-                              <p className="text-gray-900">{entrega.secuencia}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-600 font-semibold">Productos</p>
-                              <p className="text-gray-900">
-                                Alq: {entrega.alqueria} | Yog: {entrega.yogurt} | Que: {entrega.quesos}
-                              </p>
-                            </div>
-                            {entrega.ordenCompra && (
+                        <div key={entrega.id} className="px-6 py-4 hover:bg-gray-100 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                          {/* Información de entrega - Lado izquierdo */}
+                          <div className="flex-1">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                               <div>
-                                <p className="text-xs text-gray-600 font-semibold">Orden Compra</p>
-                                <p className="text-gray-900">{entrega.ordenCompra}</p>
+                                <p className="text-xs text-gray-600 font-semibold">Cliente</p>
+                                <p className="text-gray-900">{entrega.nombreCliente}</p>
                               </div>
-                            )}
+                              <div>
+                                <p className="text-xs text-gray-600 font-semibold">Ruta / Ciudad</p>
+                                <p className="text-gray-900">{entrega.ruta} - {entrega.ciudad}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-600 font-semibold">Cód. Cliente</p>
+                                <p className="text-gray-900">{entrega.codCliente}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-600 font-semibold">Secuencia</p>
+                                <p className="text-gray-900">{entrega.secuencia}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-600 font-semibold">Productos</p>
+                                <p className="text-gray-900">
+                                  Alq: {entrega.alqueria} | Yog: {entrega.yogurt} | Que: {entrega.quesos}
+                                </p>
+                              </div>
+                              {entrega.ordenCompra && (
+                                <div>
+                                  <p className="text-xs text-gray-600 font-semibold">Orden Compra</p>
+                                  <p className="text-gray-900">{entrega.ordenCompra}</p>
+                                </div>
+                              )}
+                            </div>
                           </div>
 
-                          {/* Estado de entrega - Modal Trigger */}
-                          <div className="mt-4 pt-4 border-t border-gray-200">
-                            <p className="text-xs text-gray-600 font-semibold mb-2">Estado de Entrega</p>
-                            <div className="flex items-center gap-2">
-                              {updatingEntrega === entrega.id ? (
-                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                  <Loader className="w-4 h-4 animate-spin" />
-                                  Actualizando...
-                                </div>
-                              ) : (
-                                <>
+                          {/* Estado de entrega - Lado derecho */}
+                          <div className="flex flex-col sm:flex-row items-start lg:items-center gap-2 whitespace-nowrap">
+                            {updatingEntrega === entrega.id ? (
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Loader className="w-4 h-4 animate-spin" />
+                                <span>Actualizando...</span>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                                   {entregaStatuses[entrega.id]?.status ? (
                                     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(entregaStatuses[entrega.id].status.nombre)}`}>
                                       {getStatusIcon(entregaStatuses[entrega.id].status.nombre)}
                                       {entregaStatuses[entrega.id].status.nombre}
                                     </span>
                                   ) : (
-                                    <span className="text-sm text-gray-500">Sin estado asignado</span>
+                                    <span className="text-sm text-gray-500">Sin estado</span>
                                   )}
-                                  <button
-                                    onClick={() => {
-                                      setSelectedEntrega(entrega)
-                                      setModalOpen(true)
-                                    }}
-                                    className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 cursor-pointer transition-colors"
-                                    title="Editar estado"
-                                  >
-                                    <Edit className="w-4 h-4 text-gray-600" />
-                                    <span>Editar</span>
-                                  </button>
-                                </>
-                              )}
-                            </div>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    setSelectedEntrega(entrega)
+                                    setModalOpen(true)
+                                  }}
+                                  className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                                  title="Editar estado"
+                                >
+                                  <Edit className="w-4 h-4 text-gray-600" />
+                                  <span>Editar</span>
+                                </button>
+                              </>
+                            )}
                           </div>
                         </div>
                       ))}
