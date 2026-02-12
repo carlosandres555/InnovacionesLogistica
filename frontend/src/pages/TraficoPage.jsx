@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Zap, Search, Filter } from 'lucide-react'
+import { Zap, ChevronDown, ChevronUp, Filter, Truck } from 'lucide-react'
 import { smApi } from '../services/smApi'
 
 export default function TraficoPage() {
@@ -8,6 +8,7 @@ export default function TraficoPage() {
   const [error, setError] = useState(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [expandedCarga, setExpandedCarga] = useState(null)
 
   // Filtros
   const [filters, setFilters] = useState({
@@ -26,7 +27,7 @@ export default function TraficoPage() {
       const result = await smApi.getTraficoData({
         ...filters,
         page,
-        limit: 50
+        limit: 500 // Aumentar para obtener todas las cargas
       })
       setData(result.details)
       setTotalPages(result.pagination.pages)
@@ -46,6 +47,25 @@ export default function TraficoPage() {
     }))
     setPage(1)
   }
+
+  // Agrupar por numCarga
+  const groupedByNumCarga = data.reduce((acc, item) => {
+    if (!acc[item.numCarga]) {
+      acc[item.numCarga] = []
+    }
+    acc[item.numCarga].push(item)
+    return acc
+  }, {})
+
+  // Convertir a array y ordenar
+  const cargasArray = Object.entries(groupedByNumCarga).map(([numCarga, entregas]) => ({
+    numCarga,
+    entregas,
+    totalEntregas: entregas.length,
+    totalCarga: entregas.reduce((sum, e) => sum + e.totalGeneral, 0),
+    ciudades: [...new Set(entregas.map(e => e.ciudad))].join(', '),
+    rutas: [...new Set(entregas.map(e => e.ruta))].join(', ')
+  }))
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -122,84 +142,75 @@ export default function TraficoPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Tabla para desktop */}
-          <div className="hidden sm:block bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Fecha</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Ruta</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Ciudad</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Cliente</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Carga</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Total</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {data.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-900">{item.fecha}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-blue-600">{item.ruta}</td>
-                      <td className="px-6 py-4 text-sm text-gray-700">{item.ciudad}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">{item.nombreCliente}</td>
-                      <td className="px-6 py-4 text-sm font-mono text-gray-900">{item.numCarga}</td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">{item.totalGeneral}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          {/* Cargas agrupadas */}
+          <div className="space-y-3">
+            {cargasArray.map((carga) => (
+              <div key={carga.numCarga} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                {/* Header de carga */}
+                <button
+                  onClick={() => setExpandedCarga(expandedCarga === carga.numCarga ? null : carga.numCarga)}
+                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1 text-left">
+                    <Truck className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="font-bold text-gray-900"># {carga.numCarga}</p>
+                      <p className="text-xs text-gray-600">
+                        {carga.totalEntregas} entregas • Total: {carga.totalCarga} unidades
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right mr-4">
+                    <p className="text-sm text-gray-700">{carga.rutas}</p>
+                    <p className="text-xs text-gray-500">{carga.ciudades}</p>
+                  </div>
+                  {expandedCarga === carga.numCarga ? (
+                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
 
-          {/* Tarjetas para mobile */}
-          <div className="sm:hidden space-y-3">
-            {data.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg border border-gray-200 p-4 space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-xs text-gray-600">Fecha</p>
-                    <p className="font-semibold text-gray-900">{item.fecha}</p>
+                {/* Detalles de entregas */}
+                {expandedCarga === carga.numCarga && (
+                  <div className="border-t border-gray-200 bg-gray-50">
+                    <div className="divide-y divide-gray-200">
+                      {carga.entregas.map((entrega) => (
+                        <div key={entrega.id} className="px-6 py-4 hover:bg-gray-100">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <p className="text-xs text-gray-600 font-semibold">Cliente</p>
+                              <p className="text-gray-900">{entrega.nombreCliente}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600 font-semibold">Ruta / Ciudad</p>
+                              <p className="text-gray-900">{entrega.ruta} - {entrega.ciudad}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600 font-semibold">Secuencia / Total</p>
+                              <p className="text-gray-900">{entrega.secuencia} / {entrega.totalGeneral}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600 font-semibold">Productos</p>
+                              <p className="text-gray-900">
+                                Alq: {entrega.alqueria} | Yog: {entrega.yogurt} | Que: {entrega.quesos}
+                              </p>
+                            </div>
+                            {entrega.ordenCompra && (
+                              <div>
+                                <p className="text-xs text-gray-600 font-semibold">Orden Compra</p>
+                                <p className="text-gray-900">{entrega.ordenCompra}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-600">Total</p>
-                    <p className="font-semibold text-lg text-gray-900">{item.totalGeneral}</p>
-                  </div>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-blue-600 font-medium">{item.ruta}</span>
-                  <span className="text-gray-600">{item.ciudad}</span>
-                </div>
-                <p className="text-sm text-gray-600 truncate">{item.nombreCliente}</p>
-                <p className="text-xs font-mono text-gray-500">Carga: {item.numCarga}</p>
+                )}
               </div>
             ))}
           </div>
-
-          {/* Paginación */}
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-6">
-              <button
-                onClick={() => setPage(prev => Math.max(1, prev - 1))}
-                disabled={page === 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Anterior
-              </button>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">
-                  Página {page} de {totalPages}
-                </span>
-              </div>
-              <button
-                onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={page === totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Siguiente
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>
