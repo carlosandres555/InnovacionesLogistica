@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FileText } from 'lucide-react'
 import SMUploadForm from '../components/SMUploadForm'
+import Card from '../components/Card'
 
 export default function CargaInformacionPage() {
   const [uploadedFile, setUploadedFile] = useState(null)
@@ -13,21 +14,21 @@ export default function CargaInformacionPage() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent mb-2">
+      <div className="animate-fade-in-up">
+        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-2">
           Carga de Información
         </h1>
         <p className="text-gray-600">Importa y gestiona datos del sistema</p>
       </div>
 
       {/* Módulo de Subir SM */}
-      <div className="bg-white rounded-2xl border-2 border-red-500/20 p-6 sm:p-8 shadow-lg">
+      <Card className="animate-slide-in-left">
         <div className="flex items-center gap-3 mb-6">
-          <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400">
+          <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-600">
             <FileText className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
               Subir SM
             </h2>
             <p className="text-sm text-gray-600">
@@ -50,7 +51,7 @@ export default function CargaInformacionPage() {
             </div>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

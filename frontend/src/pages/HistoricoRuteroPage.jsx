@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { History, ChevronDown, ChevronUp, Filter, Truck, Check, AlertCircle, XCircle, Download, Loader } from 'lucide-react'
 import { smApi } from '../services/smApi'
+import Button from '../components/Button'
+import Input from '../components/Input'
+import Card from '../components/Card'
 
 export default function HistoricoRuteroPage() {
   const [data, setData] = useState([])
@@ -113,38 +116,32 @@ export default function HistoricoRuteroPage() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 animate-fade-in-up">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-2">
             Histórico Rutero
           </h1>
           <p className="text-gray-600">Consulta de entregas pasadas (solo lectura)</p>
         </div>
-        <button
+        <Button
           onClick={handleExport}
           disabled={exporting || loading || data.length === 0}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
+          variant="success"
+          loading={exporting}
+          size="md"
+          className="gap-2"
           title="Descargar datos como Excel"
         >
-          {exporting ? (
-            <>
-              <Loader className="w-4 h-4 animate-spin" />
-              <span>Exportando...</span>
-            </>
-          ) : (
-            <>
-              <Download className="w-4 h-4" />
-              <span>Exportar Excel</span>
-            </>
-          )}
-        </button>
+          <Download className="w-4 h-4" />
+          {!exporting && 'Exportar Excel'}
+        </Button>
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-gray-600" />
-          <h3 className="font-semibold text-gray-900">Filtros</h3>
+      <Card className="animate-slide-in-left">
+        <div className="flex items-center gap-2 mb-6">
+          <Filter className="w-5 h-5 text-blue-600" />
+          <h3 className="font-semibold text-slate-900">Filtros</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -157,7 +154,7 @@ export default function HistoricoRuteroPage() {
               type="date"
               value={filters.fechaDesde}
               onChange={(e) => handleFilterChange('fechaDesde', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
           </div>
 
@@ -169,7 +166,7 @@ export default function HistoricoRuteroPage() {
               type="date"
               value={filters.fechaHasta}
               onChange={(e) => handleFilterChange('fechaHasta', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
           </div>
 
@@ -182,7 +179,7 @@ export default function HistoricoRuteroPage() {
               placeholder="ej: CARGA001"
               value={filters.numCarga}
               onChange={(e) => handleFilterChange('numCarga', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
           </div>
 
@@ -195,7 +192,7 @@ export default function HistoricoRuteroPage() {
               placeholder="ej: 110501"
               value={filters.codCliente}
               onChange={(e) => handleFilterChange('codCliente', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
           </div>
 
@@ -208,11 +205,11 @@ export default function HistoricoRuteroPage() {
               placeholder="ej: Juan Pérez"
               value={filters.nombreCliente}
               onChange={(e) => handleFilterChange('nombreCliente', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Datos */}
       {error ? (

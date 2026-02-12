@@ -3,6 +3,9 @@ import { Zap, ChevronDown, ChevronUp, Filter, Truck, Check, AlertCircle, XCircle
 import { smApi } from '../services/smApi'
 import { deliveryStatusApi } from '../services/deliveryStatusApi'
 import DeliveryStatusModal from '../components/DeliveryStatusModal'
+import Button from '../components/Button'
+import Input from '../components/Input'
+import Card from '../components/Card'
 
 export default function TraficoPage() {
   const [data, setData] = useState([])
@@ -163,36 +166,31 @@ export default function TraficoPage() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent mb-2">
+      <div className="animate-fade-in-up">
+        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-2">
           Tráfico - Hoy
         </h1>
         <p className="text-gray-600">Monitoreo y seguimiento de entregas del día</p>
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-gray-600" />
-          <h3 className="font-semibold text-gray-900">Filtros</h3>
+      <Card className="animate-slide-in-left">
+        <div className="flex items-center gap-2 mb-6">
+          <Filter className="w-5 h-5 text-blue-600" />
+          <h3 className="font-semibold text-slate-900">Filtros</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ruta
-            </label>
-            <input
-              type="text"
-              placeholder="ej: Q0210"
-              value={filters.ruta}
-              onChange={(e) => handleFilterChange('ruta', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
+          <Input
+            label="Ruta"
+            type="text"
+            placeholder="ej: Q0210"
+            value={filters.ruta}
+            onChange={(e) => handleFilterChange('ruta', e.target.value)}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
               Ciudad
             </label>
             <input
@@ -200,12 +198,12 @@ export default function TraficoPage() {
               placeholder="ej: Barranquilla"
               value={filters.ciudad}
               onChange={(e) => handleFilterChange('ciudad', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
               Cód. Cliente
             </label>
             <input
@@ -213,12 +211,12 @@ export default function TraficoPage() {
               placeholder="ej: 110501"
               value={filters.codCliente}
               onChange={(e) => handleFilterChange('codCliente', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
               Nombre Cliente
             </label>
             <input
@@ -226,11 +224,11 @@ export default function TraficoPage() {
               placeholder="ej: Juan Pérez"
               value={filters.nombreCliente}
               onChange={(e) => handleFilterChange('nombreCliente', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
             />
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Datos */}
       {error ? (
@@ -251,7 +249,7 @@ export default function TraficoPage() {
           {/* Cargas agrupadas */}
           <div className="space-y-3">
             {cargasArray.map((carga) => (
-              <div key={carga.numCarga} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <Card key={carga.numCarga} noPadding className="overflow-hidden">
                 {/* Header de carga */}
                 <button
                   onClick={async () => {
@@ -395,7 +393,7 @@ export default function TraficoPage() {
                       ))}
                   </div>
                 )}
-              </div>
+              </Card>
             ))}
           </div>
         </div>
