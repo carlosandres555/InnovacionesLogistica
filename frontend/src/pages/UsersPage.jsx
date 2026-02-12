@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Search, Plus, Edit2, Key, Trash2, AlertCircle } from 'lucide-react'
+import { Search, Plus, Edit2, Key, Trash2, AlertCircle, ArrowUp, ArrowDown } from 'lucide-react'
 import { usersApi } from '../services/usersApi'
 import UserFormModal from '../components/UserFormModal'
 import ResetPasswordModal from '../components/ResetPasswordModal'
@@ -17,6 +17,10 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState(null)
   const [showPasswordReset, setShowPasswordReset] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
+
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState('firstName')
+  const [sortDirection, setSortDirection] = useState('asc')
 
   // Fetch users
   const { data, isLoading, error } = useQuery({
@@ -101,6 +105,45 @@ export default function UsersPage() {
 
   const isLoading_ = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending
 
+  // Sorting function
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      // Toggle direction if clicking same column
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      // New column, start with ascending
+      setSortColumn(column)
+      setSortDirection('asc')
+    }
+  }
+
+  // Sort users data
+  const sortedUsers = data?.users ? [...data.users].sort((a, b) => {
+    let aValue = a[sortColumn]
+    let bValue = b[sortColumn]
+
+    // Handle null/undefined
+    if (aValue === null || aValue === undefined) aValue = ''
+    if (bValue === null || bValue === undefined) bValue = ''
+
+    // Convert to lowercase for string comparison
+    if (typeof aValue === 'string') aValue = aValue.toLowerCase()
+    if (typeof bValue === 'string') bValue = bValue.toLowerCase()
+
+    // Compare
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+    return 0
+  }) : []
+
+  // Render sort icon
+  const renderSortIcon = (column) => {
+    if (sortColumn !== column) return null
+    return sortDirection === 'asc'
+      ? <ArrowUp className="w-4 h-4 ml-1" />
+      : <ArrowDown className="w-4 h-4 ml-1" />
+  }
+
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
@@ -165,35 +208,67 @@ export default function UsersPage() {
             {/* Desktop Table */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-slate-900 border-b border-slate-700">
+                <thead className="bg-slate-900 border-b border-slate-700 sticky top-0">
                   <tr>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-white">
-                      Usuario
+                    <th
+                      onClick={() => handleSort('firstName')}
+                      className="px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-white cursor-pointer hover:bg-slate-800 transition-colors group"
+                    >
+                      <div className="flex items-center gap-1">
+                        Usuario
+                        {renderSortIcon('firstName')}
+                      </div>
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300">
-                      Email
+                    <th
+                      onClick={() => handleSort('email')}
+                      className="px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-300 cursor-pointer hover:bg-slate-800 transition-colors"
+                    >
+                      <div className="flex items-center gap-1">
+                        Email
+                        {renderSortIcon('email')}
+                      </div>
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300">
-                      Teléfono
+                    <th
+                      onClick={() => handleSort('phone')}
+                      className="px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-300 cursor-pointer hover:bg-slate-800 transition-colors"
+                    >
+                      <div className="flex items-center gap-1">
+                        Teléfono
+                        {renderSortIcon('phone')}
+                      </div>
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300">
-                      Rol
+                    <th
+                      onClick={() => handleSort('role')}
+                      className="px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-300 cursor-pointer hover:bg-slate-800 transition-colors"
+                    >
+                      <div className="flex items-center gap-1">
+                        Rol
+                        {renderSortIcon('role')}
+                      </div>
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300">
-                      Estado
+                    <th
+                      onClick={() => handleSort('isActive')}
+                      className="px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-300 cursor-pointer hover:bg-slate-800 transition-colors"
+                    >
+                      <div className="flex items-center gap-1">
+                        Estado
+                        {renderSortIcon('isActive')}
+                      </div>
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-right text-xs sm:text-sm font-semibold text-slate-300">
+                    <th className="px-6 py-3.5 text-right text-xs sm:text-sm font-semibold text-slate-300">
                       Acciones
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {data?.users?.map(user => (
+                  {sortedUsers.map((user, index) => (
                     <tr
                       key={user.id}
-                      className="hover:bg-blue-50 transition-colors duration-200"
+                      className={`transition-colors duration-200 ${
+                        index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                      } hover:bg-blue-50`}
                     >
-                      <td className="px-4 sm:px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <div>
                           <p className="font-medium text-gray-900 text-sm">
                             {user.firstName} {user.lastName}
@@ -203,13 +278,13 @@ export default function UsersPage() {
                           </p>
                         </div>
                       </td>
-                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-700">
+                      <td className="px-6 py-3.5 text-xs sm:text-sm text-gray-700">
                         {user.email}
                       </td>
-                      <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-700">
+                      <td className="px-6 py-3.5 text-xs sm:text-sm text-gray-700">
                         {user.phone || '-'}
                       </td>
-                      <td className="px-4 sm:px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(
                             user.role
@@ -218,7 +293,7 @@ export default function UsersPage() {
                           {user.role}
                         </span>
                       </td>
-                      <td className="px-4 sm:px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
                             user.isActive
@@ -229,7 +304,7 @@ export default function UsersPage() {
                           {user.isActive ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td className="px-4 sm:px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleEditClick(user)}
