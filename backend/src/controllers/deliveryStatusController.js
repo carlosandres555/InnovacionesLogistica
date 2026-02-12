@@ -271,3 +271,30 @@ export const getEntregaDeliveryStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+// Delete delivery status reason (admin only)
+export const deleteDeliveryStatusReason = async (req, res, next) => {
+  try {
+    const { reasonId } = req.params;
+
+    // Verificar que el motivo existe
+    const reason = await prisma.deliveryStatusReason.findUnique({
+      where: { id: reasonId },
+    });
+
+    if (!reason) {
+      return res.status(404).json({ error: "Motivo no encontrado" });
+    }
+
+    // Eliminar el motivo
+    await prisma.deliveryStatusReason.delete({
+      where: { id: reasonId },
+    });
+
+    res.json({
+      message: "Motivo eliminado exitosamente",
+    });
+  } catch (error) {
+    next(error);
+  }
+};

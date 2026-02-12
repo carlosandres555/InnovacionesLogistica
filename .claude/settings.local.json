@@ -56,7 +56,8 @@
       "Bash(aws s3 ls:*)",
       "Bash(ssh:*)",
       "Bash(git -C /Users/carlosrodriguez/Project/DistribucionCosta branch -a)",
-      "Bash(git -C /Users/carlosrodriguez/Project/DistribucionCosta remote -v)"
+      "Bash(git -C /Users/carlosrodriguez/Project/DistribucionCosta remote -v)",
+      "Bash(npx prisma db seed:*)"
     ]
   }
 }

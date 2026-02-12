@@ -6,6 +6,7 @@ import {
   getEntregaDeliveryStatus,
   getReasonsByStatus,
   createDeliveryStatusReason,
+  deleteDeliveryStatusReason,
 } from "../controllers/deliveryStatusController.js";
 import { requireRole } from "../middleware/auth.js";
 
@@ -28,5 +29,8 @@ router.post("/reasons", requireRole("ADMIN"), createDeliveryStatusReason);
 
 // PUT - Actualizar estado de una entrega
 router.put("/entrega/:entregaId", updateEntregaDeliveryStatus);
+
+// DELETE - Eliminar un motivo (admin only)
+router.delete("/reasons/:reasonId", requireRole("ADMIN"), deleteDeliveryStatusReason);
 
 export default router;

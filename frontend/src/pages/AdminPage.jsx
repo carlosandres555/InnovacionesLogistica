@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [statusReasons, setStatusReasons] = useState({}) // { statusId: [reasons] }
   const [showReasonForm, setShowReasonForm] = useState(null) // statusId or null
   const [reasonFormSubmitting, setReasonFormSubmitting] = useState(false)
+  const [deletingReason, setDeletingReason] = useState(null) // reasonId being deleted
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -164,6 +165,32 @@ export default function AdminPage() {
       console.error(err)
     } finally {
       setReasonFormSubmitting(false)
+    }
+  }
+
+  const handleDeleteReason = async (reasonId, statusId, reasonName) => {
+    if (!window.confirm(`¿Eliminar motivo "${reasonName}"?`)) {
+      return
+    }
+
+    setDeletingReason(reasonId)
+    setError(null)
+
+    try {
+      await deliveryStatusApi.deleteDeliveryStatusReason(reasonId)
+
+      setSuccessMessage(`Motivo "${reasonName}" eliminado exitosamente`)
+
+      // Reload reasons
+      await loadReasonsByStatus(statusId)
+
+      // Clear message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000)
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al eliminar motivo')
+      console.error(err)
+    } finally {
+      setDeletingReason(null)
     }
   }
 
@@ -355,11 +382,28 @@ export default function AdminPage() {
                       ) : (
                         <div className="space-y-2 mb-3">
                           {statusReasons[status.id]?.map(reason => (
-                            <div key={reason.id} className="bg-white rounded p-2 text-sm">
-                              <p className="font-medium text-gray-900">{reason.nombre}</p>
-                              {reason.descripcion && (
-                                <p className="text-xs text-gray-600">{reason.descripcion}</p>
-                              )}
+                            <div
+                              key={reason.id}
+                              className="bg-white rounded p-3 text-sm flex items-start justify-between group hover:bg-red-50 transition-colors"
+                            >
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-900">{reason.nombre}</p>
+                                {reason.descripcion && (
+                                  <p className="text-xs text-gray-600">{reason.descripcion}</p>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => handleDeleteReason(reason.id, status.id, reason.nombre)}
+                                disabled={deletingReason === reason.id}
+                                className="ml-2 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                                title="Eliminar motivo"
+                              >
+                                {deletingReason === reason.id ? (
+                                  <Loader className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
                             </div>
                           ))}
                         </div>

@@ -65,4 +65,10 @@ export const deliveryStatusApi = {
     })
     return data
   },
+
+  // Eliminar un motivo (admin only)
+  deleteDeliveryStatusReason: async (reasonId) => {
+    const { data } = await axios.delete(`${API_URL}/delivery-status/reasons/${reasonId}`)
+    return data
+  },
 }
