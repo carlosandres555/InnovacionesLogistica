@@ -22,7 +22,8 @@ export default function TraficoPage() {
     fecha: '',
     ruta: '',
     ciudad: '',
-    codCliente: ''
+    codCliente: '',
+    nombreCliente: ''
   })
 
   useEffect(() => {
@@ -176,7 +177,7 @@ export default function TraficoPage() {
           <h3 className="font-semibold text-gray-900">Filtros</h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Fecha
@@ -225,6 +226,19 @@ export default function TraficoPage() {
               placeholder="ej: 110501"
               value={filters.codCliente}
               onChange={(e) => handleFilterChange('codCliente', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre Cliente
+            </label>
+            <input
+              type="text"
+              placeholder="ej: Juan Pérez"
+              value={filters.nombreCliente}
+              onChange={(e) => handleFilterChange('nombreCliente', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
