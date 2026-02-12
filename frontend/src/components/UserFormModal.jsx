@@ -77,15 +77,15 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-red-500/20">
-        <div className="sticky top-0 bg-gradient-to-r from-red-50 to-rose-50 border-b border-red-500/20 p-4 sm:p-6 flex items-center justify-between">
-          <h3 className="text-base sm:text-lg font-semibold text-red-900">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-blue-200">
+        <div className="sticky top-0 bg-slate-900 border-b border-slate-700 p-4 sm:p-6 flex items-center justify-between">
+          <h3 className="text-base sm:text-lg font-semibold text-white">
             {isEditing ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
           </h3>
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="text-red-600 hover:text-red-700 hover:bg-red-100 rounded-lg p-1 transition disabled:opacity-50"
+            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg p-1 transition disabled:opacity-50"
             aria-label="Cerrar"
           >
             <X className="w-6 h-6" />
@@ -96,38 +96,38 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
           {/* Name Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-red-900 mb-2">Nombre</label>
+              <label className="block text-sm font-medium text-slate-900 mb-2">Nombre</label>
               <input
                 type="text"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className={`w-full px-4 py-3 text-sm bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition ${
-                  errors.firstName ? 'border-red-500' : 'border-red-500/20'
+                className={`w-full px-4 py-3 text-sm bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition ${
+                  errors.firstName ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Juan"
               />
               {errors.firstName && (
-                <p className="text-sm text-red-600 mt-1">{errors.firstName}</p>
+                <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-red-900 mb-2">Apellido</label>
+              <label className="block text-sm font-medium text-slate-900 mb-2">Apellido</label>
               <input
                 type="text"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className={`w-full px-4 py-3 text-sm bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition ${
-                  errors.lastName ? 'border-red-500' : 'border-red-500/20'
+                className={`w-full px-4 py-3 text-sm bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition ${
+                  errors.lastName ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Pérez"
               />
               {errors.lastName && (
-                <p className="text-sm text-red-600 mt-1">{errors.lastName}</p>
+                <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>
               )}
             </div>
           </div>
@@ -141,8 +141,8 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
               value={formData.email}
               onChange={handleChange}
               disabled={isLoading || isEditing}
-              className={`w-full px-4 py-3 text-sm bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition ${
-                errors.email ? 'border-red-500' : 'border-red-500/20'
+              className={`w-full px-4 py-3 text-sm bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition ${
+                errors.email ? 'border-red-500' : 'border-blue-200'
               }`}
               placeholder="juan@example.com"
             />
@@ -154,7 +154,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
           {/* Password - Only for new users */}
           {!isEditing && (
             <div>
-              <label className="block text-sm font-medium text-red-900 mb-2">
+              <label className="block text-sm font-medium text-slate-900 mb-2">
                 Contraseña
               </label>
               <input
@@ -163,13 +163,13 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
                 value={formData.password}
                 onChange={handleChange}
                 disabled={isLoading}
-                className={`w-full px-4 py-3 text-sm bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition ${
-                  errors.password ? 'border-red-500' : 'border-red-500/20'
+                className={`w-full px-4 py-3 text-sm bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition ${
+                  errors.password ? 'border-red-500' : 'border-blue-200'
                 }`}
                 placeholder="Mínimo 6 caracteres"
               />
               {errors.password && (
-                <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+                <p className="text-sm text-red-500 mt-1">{errors.password}</p>
               )}
             </div>
           )}
@@ -185,7 +185,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
               value={formData.phone}
               onChange={handleChange}
               disabled={isLoading}
-              className="w-full px-4 py-3 text-sm bg-gray-50 border border-red-500/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition"
+              className="w-full px-4 py-3 text-sm bg-gray-50 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 text-gray-900 placeholder-gray-400 transition"
               placeholder="+57 3001234567"
             />
           </div>
@@ -198,7 +198,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
               value={formData.role}
               onChange={handleChange}
               disabled={isLoading}
-              className="w-full px-4 py-3 text-sm bg-gray-50 border border-red-500/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 text-gray-900 transition"
+              className="w-full px-4 py-3 text-sm bg-gray-50 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 text-gray-900 transition"
             >
               {ROLES.map(role => (
                 <option key={role} value={role}>
@@ -215,19 +215,19 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 sm:pt-6 border-t border-red-500/10">
+          <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 sm:pt-6 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-3 text-sm text-red-700 bg-red-50 border border-red-500/20 hover:bg-red-100 rounded-xl transition disabled:opacity-50 order-2 sm:order-1 font-medium"
+              className="px-4 py-3 text-sm text-gray-700 bg-gray-100 border border-blue-200 hover:bg-red-100 rounded-xl transition disabled:opacity-50 order-2 sm:order-1 font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-3 text-sm bg-gradient-to-r from-red-600 to-red-400 hover:from-red-500 hover:to-red-300 text-white rounded-xl transition disabled:opacity-50 order-1 sm:order-2 font-medium shadow-lg hover:shadow-xl hover:shadow-red-900/50"
+              className="px-4 py-3 text-sm bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-xl transition disabled:opacity-50 order-1 sm:order-2 font-medium shadow-lg hover:shadow-xl hover:shadow-blue-900/50"
             >
               {isLoading ? 'Guardando...' : isEditing ? 'Actualizar' : 'Crear Usuario'}
             </button>

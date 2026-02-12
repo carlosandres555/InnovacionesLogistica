@@ -91,8 +91,8 @@ export default function UsersPage() {
 
   const getRoleBadgeColor = (role) => {
     const colors = {
-      ADMIN: 'bg-red-100 text-red-800',
-      ANALISTA: 'bg-blue-100 text-blue-800',
+      ADMIN: 'bg-blue-100 text-blue-800',
+      ANALISTA: 'bg-purple-100 text-purple-800',
       IN_HOUSE: 'bg-green-100 text-green-800',
       CUSTOMER: 'bg-gray-100 text-gray-800'
     }
@@ -140,9 +140,9 @@ export default function UsersPage() {
 
       {/* Error */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+        <div className="p-4 bg-blue-50 border border-red-200 rounded-xl flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-          <p className="text-red-700 text-sm">
+          <p className="text-blue-700 text-sm">
             {error.message || 'Error al cargar usuarios'}
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function UsersPage() {
         {/* Table */}
         {isLoading ? (
           <div className="p-12 text-center text-gray-500 text-sm">
-            <div className="inline-block w-8 h-8 border-3 border-red-400/30 border-t-red-500 rounded-full animate-spin mb-4"></div>
+            <div className="inline-block w-8 h-8 border-3 border-blue-400/30 border-t-blue-500 rounded-full animate-spin mb-4"></div>
             <p>Cargando usuarios...</p>
           </div>
         ) : data?.users?.length === 0 ? (
@@ -165,33 +165,33 @@ export default function UsersPage() {
             {/* Desktop Table */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-red-50 to-rose-50 border-b border-red-500/20">
+                <thead className="bg-slate-900 border-b border-slate-700">
                   <tr>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-900">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-white">
                       Usuario
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300">
                       Email
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300">
                       Teléfono
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300">
                       Rol
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-red-300">
+                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300">
                       Estado
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-right text-xs sm:text-sm font-semibold text-red-300">
+                    <th className="px-4 sm:px-6 py-4 text-right text-xs sm:text-sm font-semibold text-slate-300">
                       Acciones
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-red-500/10">
+                <tbody className="divide-y divide-gray-200">
                   {data?.users?.map(user => (
                     <tr
                       key={user.id}
-                      className="hover:bg-red-50 transition-colors duration-200"
+                      className="hover:bg-blue-50 transition-colors duration-200"
                     >
                       <td className="px-4 sm:px-6 py-4">
                         <div>
@@ -223,7 +223,7 @@ export default function UsersPage() {
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
                             user.isActive
                               ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                              : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                              : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                           }`}
                         >
                           {user.isActive ? 'Activo' : 'Inactivo'}
@@ -250,7 +250,7 @@ export default function UsersPage() {
                           <button
                             onClick={() => setShowDeleteConfirm(user)}
                             disabled={isLoading_}
-                            className="p-2 text-red-400 hover:bg-red-600/30 rounded-lg transition disabled:opacity-50"
+                            className="p-2 text-blue-400 hover:bg-blue-600/30 rounded-lg transition disabled:opacity-50"
                             title="Desactivar"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -268,7 +268,7 @@ export default function UsersPage() {
               {data?.users?.map(user => (
                 <div
                   key={user.id}
-                  className="border border-red-500/20 rounded-xl p-4 space-y-3 bg-red-50/30 hover:bg-red-50 transition-colors duration-200"
+                  className="border border-blue-200 rounded-xl p-4 space-y-3 bg-blue-50/30 hover:bg-blue-50 transition-colors duration-200"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
@@ -299,7 +299,7 @@ export default function UsersPage() {
                       <button
                         onClick={() => setShowDeleteConfirm(user)}
                         disabled={isLoading_}
-                        className="p-2 text-red-400 hover:bg-red-600/30 rounded-lg transition disabled:opacity-50"
+                        className="p-2 text-blue-400 hover:bg-blue-600/30 rounded-lg transition disabled:opacity-50"
                         title="Desactivar"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -328,7 +328,7 @@ export default function UsersPage() {
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           user.isActive
                             ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                            : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                            : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                         }`}
                       >
                         {user.isActive ? 'Activo' : 'Inactivo'}
@@ -343,7 +343,7 @@ export default function UsersPage() {
 
         {/* Pagination */}
         {data?.pagination && data.pagination.pages > 1 && (
-          <div className="px-4 sm:px-6 py-4 border-t border-red-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-red-50/30">
+          <div className="px-4 sm:px-6 py-4 border-t border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-blue-50/30">
             <p className="text-xs sm:text-sm text-gray-600">
               Página {data.pagination.page} de {data.pagination.pages} (
               {data.pagination.total} usuarios)
@@ -352,14 +352,14 @@ export default function UsersPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 text-sm border border-red-500/20 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg disabled:opacity-50 transition"
+                className="px-4 py-2 text-sm border border-blue-200 bg-blue-50 hover:bg-red-100 text-blue-700 rounded-lg disabled:opacity-50 transition"
               >
                 Anterior
               </button>
               <button
                 onClick={() => setPage(p => Math.min(data.pagination.pages, p + 1))}
                 disabled={page === data.pagination.pages}
-                className="px-4 py-2 text-sm border border-red-500/20 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg disabled:opacity-50 transition"
+                className="px-4 py-2 text-sm border border-blue-200 bg-blue-50 hover:bg-red-100 text-blue-700 rounded-lg disabled:opacity-50 transition"
               >
                 Siguiente
               </button>
