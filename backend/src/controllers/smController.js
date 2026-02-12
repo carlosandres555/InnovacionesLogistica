@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import XLSX from 'xlsx';
 import { z } from "zod";
+import { isFechaToday, isFechaPast } from '../utils/dateUtils.js';
 
 const prisma = new PrismaClient();
 
@@ -26,6 +27,47 @@ const coerceValue = (value) => {
   if (value === null || value === undefined || value === '') return 0;
   const num = Number(value);
   return isNaN(num) ? 0 : num;
+};
+
+// Convertir número de serie de Excel a fecha en formato "DD-Mmm" o "DD-Mmm-YYYY"
+const convertExcelDateToString = (value) => {
+  // Si ya es un string de fecha válido, devolverlo
+  if (typeof value === 'string' && value.match(/^\d{1,2}-[a-z]{3}(-\d{4})?$/i)) {
+    return value;
+  }
+
+  // Si es un número (serial de Excel)
+  const num = Number(value);
+  if (isNaN(num) || num < 0) {
+    return value?.toString() || '';
+  }
+
+  // Excel serial date: 1 = 1900-01-01
+  // Pero Excel tiene un bug y considera 1900 como bisiesto
+  // Por lo que hay que ajustar si el serial > 59
+  const excelEpoch = new Date(1900, 0, 1);
+  const daysToAdd = num - 1; // Restar 1 porque Excel cuenta desde 1
+  const date = new Date(excelEpoch.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+
+  // Verificar si es una fecha válida
+  if (isNaN(date.getTime())) {
+    return value?.toString() || '';
+  }
+
+  // Convertir a formato "DD-Mmm" o "DD-Mmm-YYYY"
+  const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  // Si el año es 2026 (año actual típicamente), no incluir año
+  // Si es otro año, incluirlo
+  const currentYear = new Date().getFullYear();
+  if (year === currentYear) {
+    return `${day}-${month}`;
+  } else {
+    return `${day}-${month}-${year}`;
+  }
 };
 
 // Get all SM uploads with details
@@ -173,7 +215,7 @@ export const uploadSMFile = async (req, res, next) => {
       }
 
       const rowData = {
-        FECHA: worksheet[`A${i}`]?.v?.toString() || "",
+        FECHA: convertExcelDateToString(worksheet[`A${i}`]?.v),
         RUTA: ruta,
         CIUDAD: ciudad,
         CARGAS: worksheet[`D${i}`]?.v?.toString() || "",
@@ -306,87 +348,266 @@ export const uploadSMFile = async (req, res, next) => {
   }
 };
 
-// Get all SM details for tráfico (with filters)
+// Get all SM details for tráfico (only today's records - editable)
 export const getTraficoData = async (req, res, next) => {
   try {
-    const { fecha, ruta, ciudad, codCliente, nombreCliente, page = 1, limit = 50 } = req.query;
+    const { ruta, ciudad, codCliente, nombreCliente, page = 1, limit = 50 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Construir filtros
+    // Construir filtros (sin fecha, solo otros filtros)
     const filters = {};
 
-    if (fecha) filters.fecha = fecha;
     if (ruta) filters.ruta = { contains: ruta, mode: "insensitive" };
     if (ciudad) filters.ciudad = { contains: ciudad, mode: "insensitive" };
     if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
     if (nombreCliente) filters.nombreCliente = { contains: nombreCliente, mode: "insensitive" };
 
-    const [details, total, progressByRoute] = await Promise.all([
-      prisma.sMDetail.findMany({
-        where: filters,
-        include: {
-          smUpload: {
-            select: {
-              id: true,
-              fileName: true,
-              createdAt: true,
-            },
-          },
-          deliveryStatus: {
-            select: {
-              id: true,
-            },
+    // Obtener todos los registros (sin paginación en BD) y filtrar por fecha en JS
+    const allDetails = await prisma.sMDetail.findMany({
+      where: filters,
+      include: {
+        smUpload: {
+          select: {
+            id: true,
+            fileName: true,
+            createdAt: true,
           },
         },
-        skip,
-        take: parseInt(limit),
-        orderBy: { fecha: "desc" },
-      }),
-      prisma.sMDetail.count({ where: filters }),
-      // Calcular progreso por numCarga
-      prisma.sMDetail.groupBy({
-        by: ["numCarga"],
-        where: filters,
-        _count: {
-          id: true,
+        deliveryStatus: {
+          select: {
+            id: true,
+          },
         },
-      }).then(async (groups) => {
-        const progressMap = {};
+      },
+      orderBy: { fecha: "desc" },
+    });
 
-        for (const group of groups) {
-          const withStatus = await prisma.sMDetail.count({
-            where: {
-              numCarga: group.numCarga,
-              ...filters,
-              deliveryStatus: {
-                isNot: null,
-              },
-            },
-          });
+    // Filtrar solo registros de HOY
+    const todayDetails = allDetails.filter(d => isFechaToday(d.fecha));
 
-          const total = group._count.id;
-          progressMap[group.numCarga] = {
-            total,
-            asignadas: withStatus,
-            porcentaje: total > 0 ? Math.round((withStatus / total) * 100) : 0,
-          };
-        }
+    // Aplicar paginación después de filtrar
+    const paginatedDetails = todayDetails.slice(skip, skip + parseInt(limit));
 
-        return progressMap;
-      }),
-    ]);
+    // Calcular progreso por numCarga (solo para registros de hoy)
+    const progressByRoute = {};
+    const uniqueCarga = new Set(todayDetails.map(d => d.numCarga));
+
+    for (const numCarga of uniqueCarga) {
+      const cargaDetails = todayDetails.filter(d => d.numCarga === numCarga);
+      const withStatus = cargaDetails.filter(d => d.deliveryStatus).length;
+      const total = cargaDetails.length;
+
+      progressByRoute[numCarga] = {
+        total,
+        asignadas: withStatus,
+        porcentaje: total > 0 ? Math.round((withStatus / total) * 100) : 0,
+      };
+    }
 
     res.json({
-      details,
+      details: paginatedDetails,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / parseInt(limit)),
+        total: todayDetails.length,
+        pages: Math.ceil(todayDetails.length / parseInt(limit)),
       },
       progressByRoute,
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+// Get historical SM details (only past records - read-only)
+export const getHistoricoData = async (req, res, next) => {
+  try {
+    const { fecha, numCarga, codCliente, nombreCliente, page = 1, limit = 100 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Construir filtros
+    const filters = {};
+
+    if (numCarga) filters.numCarga = { contains: numCarga, mode: "insensitive" };
+    if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
+    if (nombreCliente) filters.nombreCliente = { contains: nombreCliente, mode: "insensitive" };
+
+    // Obtener todos los registros para filtrar por fecha en JS
+    const allDetails = await prisma.sMDetail.findMany({
+      where: filters,
+      include: {
+        smUpload: {
+          select: {
+            id: true,
+            fileName: true,
+            createdAt: true,
+          },
+        },
+        deliveryStatus: {
+          include: {
+            status: {
+              select: {
+                id: true,
+                nombre: true,
+                color: true,
+              },
+            },
+            reason: {
+              select: {
+                id: true,
+                nombre: true,
+              },
+            },
+            updatedBy: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { fecha: "desc" },
+    });
+
+    // Filtrar solo registros PASADOS
+    let historicalDetails = allDetails.filter(d => isFechaPast(d.fecha));
+
+    // Filtrar por fecha si se proporciona
+    if (fecha) {
+      historicalDetails = historicalDetails.filter(d => d.fecha.includes(fecha));
+    }
+
+    // Aplicar paginación
+    const paginatedDetails = historicalDetails.slice(skip, skip + parseInt(limit));
+
+    res.json({
+      details: paginatedDetails,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: historicalDetails.length,
+        pages: Math.ceil(historicalDetails.length / parseInt(limit)),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Export historical data to Excel
+export const exportHistoricoExcel = async (req, res, next) => {
+  try {
+    const { fecha, numCarga, codCliente, nombreCliente } = req.query;
+
+    // Construir filtros
+    const filters = {};
+
+    if (numCarga) filters.numCarga = { contains: numCarga, mode: "insensitive" };
+    if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
+    if (nombreCliente) filters.nombreCliente = { contains: nombreCliente, mode: "insensitive" };
+
+    // Obtener todos los registros
+    const allDetails = await prisma.sMDetail.findMany({
+      where: filters,
+      include: {
+        deliveryStatus: {
+          include: {
+            status: {
+              select: {
+                nombre: true,
+              },
+            },
+            reason: {
+              select: {
+                nombre: true,
+              },
+            },
+            updatedBy: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { fecha: "desc" },
+    });
+
+    // Filtrar solo registros PASADOS
+    let historicalDetails = allDetails.filter(d => isFechaPast(d.fecha));
+
+    // Filtrar por fecha si se proporciona
+    if (fecha) {
+      historicalDetails = historicalDetails.filter(d => d.fecha.includes(fecha));
+    }
+
+    // Preparar datos para Excel
+    const excelData = historicalDetails.map(d => ({
+      Fecha: d.fecha,
+      Ruta: d.ruta,
+      Ciudad: d.ciudad,
+      Placa: d.cargas,
+      Secuencia: d.secuencia,
+      Cliente: d.nombreCliente,
+      "Código Cliente": d.codCliente,
+      Alquería: d.alqueria,
+      Yogurt: d.yogurt,
+      Quesos: d.quesos,
+      "Total General": d.totalGeneral,
+      "Número Carga": d.numCarga,
+      "Orden de Compra": d.ordenCompra || "N/A",
+      Estado: d.deliveryStatus?.status?.nombre || "Sin asignar",
+      Motivo: d.deliveryStatus?.reason?.nombre || "N/A",
+      Observaciones: d.deliveryStatus?.observaciones || "N/A",
+      "Recogió Devolución": d.deliveryStatus?.recogioDevoluccion ? "Sí" : "No",
+      "Actualizado Por": d.deliveryStatus?.updatedBy
+        ? `${d.deliveryStatus.updatedBy.firstName} ${d.deliveryStatus.updatedBy.lastName}`
+        : "N/A",
+      "Fecha Actualización": d.deliveryStatus?.updatedAt
+        ? new Date(d.deliveryStatus.updatedAt).toLocaleString("es-CO")
+        : "N/A",
+    }));
+
+    // Crear workbook de Excel
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(excelData);
+
+    // Ajustar ancho de columnas
+    const columnWidths = [
+      { wch: 12 }, // Fecha
+      { wch: 15 }, // Ruta
+      { wch: 12 }, // Ciudad
+      { wch: 10 }, // Placa
+      { wch: 10 }, // Secuencia
+      { wch: 20 }, // Cliente
+      { wch: 12 }, // Código Cliente
+      { wch: 10 }, // Alquería
+      { wch: 10 }, // Yogurt
+      { wch: 10 }, // Quesos
+      { wch: 12 }, // Total General
+      { wch: 12 }, // Número Carga
+      { wch: 15 }, // Orden de Compra
+      { wch: 15 }, // Estado
+      { wch: 20 }, // Motivo
+      { wch: 20 }, // Observaciones
+      { wch: 15 }, // Recogió Devolución
+      { wch: 20 }, // Actualizado Por
+      { wch: 22 }, // Fecha Actualización
+    ];
+    ws["!cols"] = columnWidths;
+
+    XLSX.utils.book_append_sheet(wb, ws, "Histórico Rutero");
+
+    const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+    const timestamp = new Date().toISOString().split("T")[0];
+
+    res.setHeader("Content-Disposition", `attachment; filename="historico_rutero_${timestamp}.xlsx"`);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.send(buffer);
+  } catch (error) {
+    console.error("Error exporting to Excel:", error);
     next(error);
   }
 };

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 
-const MODULES = ['dashboard', 'users', 'trafico', 'cargaInformacion']
 const ROLES = ['CUSTOMER', 'IN_HOUSE', 'ANALISTA', 'ADMIN']
 
 export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, initialData }) {
@@ -11,8 +10,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
     email: '',
     password: '',
     phone: '',
-    role: 'CUSTOMER',
-    permissions: { modules: ['dashboard'] }
+    role: 'CUSTOMER'
   })
 
   const [errors, setErrors] = useState({})
@@ -26,8 +24,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
         email: initialData.email || '',
         password: '',
         phone: initialData.phone || '',
-        role: initialData.role || 'CUSTOMER',
-        permissions: initialData.permissions || { modules: ['dashboard'] }
+        role: initialData.role || 'CUSTOMER'
       })
     } else {
       setFormData({
@@ -36,8 +33,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
         email: '',
         password: '',
         phone: '',
-        role: 'CUSTOMER',
-        permissions: { modules: ['dashboard'] }
+        role: 'CUSTOMER'
       })
     }
     setErrors({})
@@ -57,19 +53,6 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
     }
   }
 
-  const handleModuleToggle = (module) => {
-    setFormData(prev => {
-      const modules = prev.permissions.modules.includes(module)
-        ? prev.permissions.modules.filter(m => m !== module)
-        : [...prev.permissions.modules, module]
-
-      return {
-        ...prev,
-        permissions: { modules }
-      }
-    })
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault()
 
@@ -81,7 +64,6 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
     if (!formData.email.includes('@')) newErrors.email = 'Email inválido'
     if (!isEditing && !formData.password) newErrors.password = 'Contraseña requerida'
     if (!isEditing && formData.password.length < 6) newErrors.password = 'Contraseña mínimo 6 caracteres'
-    if (formData.permissions.modules.length === 0) newErrors.modules = 'Selecciona al menos un módulo'
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -220,34 +202,16 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
             >
               {ROLES.map(role => (
                 <option key={role} value={role}>
-                  {role}
+                  {role === 'CUSTOMER' && '👤 CUSTOMER (Acceso básico)'}
+                  {role === 'IN_HOUSE' && '🏢 IN_HOUSE (Tráfico e histórico)'}
+                  {role === 'ANALISTA' && '📊 ANALISTA (Gestión de logística)'}
+                  {role === 'ADMIN' && '🔐 ADMIN (Acceso total)'}
                 </option>
               ))}
             </select>
-          </div>
-
-          {/* Modules */}
-          <div>
-            <label className="block text-sm font-medium text-red-900 mb-3">
-              Módulos Permitidos
-            </label>
-            <div className="space-y-2">
-              {MODULES.map(module => (
-                <label key={module} className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.permissions.modules.includes(module)}
-                    onChange={() => handleModuleToggle(module)}
-                    disabled={isLoading}
-                    className="w-4 h-4 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 accent-red-600"
-                  />
-                  <span className="ml-3 text-sm text-gray-700 capitalize">{module}</span>
-                </label>
-              ))}
-            </div>
-            {errors.modules && (
-              <p className="text-sm text-red-600 mt-2">{errors.modules}</p>
-            )}
+            <p className="text-xs text-gray-500 mt-2">
+              Los módulos se asignan automáticamente según el rol
+            </p>
           </div>
 
           {/* Actions */}

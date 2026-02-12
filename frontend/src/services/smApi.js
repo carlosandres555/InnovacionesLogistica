@@ -27,9 +27,33 @@ export const smApi = {
     return data
   },
 
-  // Obtener datos para módulo de Tráfico
+  // Obtener datos para módulo de Tráfico (solo hoy)
   getTraficoData: async (params = {}) => {
     const { data } = await axios.get(`${API_URL}/sm/trafico`, { params })
     return data
+  },
+
+  // Obtener datos históricos (solo entregas pasadas)
+  getHistoricoData: async (params = {}) => {
+    const { data } = await axios.get(`${API_URL}/sm/historico`, { params })
+    return data
+  },
+
+  // Exportar histórico a Excel
+  exportHistoricoExcel: async (params = {}) => {
+    const response = await axios.get(`${API_URL}/sm/historico/export`, {
+      params,
+      responseType: 'blob'
+    })
+
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    const timestamp = new Date().toISOString().split('T')[0]
+    link.setAttribute('download', `historico_rutero_${timestamp}.xlsx`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
   }
 }

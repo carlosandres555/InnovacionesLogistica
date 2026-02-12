@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, X, LogOut, Home, Users, Zap, Upload, Settings } from 'lucide-react'
+import { Menu, X, LogOut, Home, Users, Zap, Upload, Settings, History } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
 export default function Layout({ children }) {
@@ -20,6 +20,9 @@ export default function Layout({ children }) {
       : []),
     ...(user?.permissions?.modules?.includes('trafico')
       ? [{ href: '/trafico', label: 'Tráfico', icon: Zap, permission: 'trafico' }]
+      : []),
+    ...(user?.permissions?.modules?.includes('trafico')
+      ? [{ href: '/historico-rutero', label: 'Histórico Rutero', icon: History, permission: 'historicoRutero' }]
       : []),
     ...(user?.permissions?.modules?.includes('cargaInformacion')
       ? [{ href: '/carga-informacion', label: 'Carga de Información', icon: Upload, permission: 'cargaInformacion' }]

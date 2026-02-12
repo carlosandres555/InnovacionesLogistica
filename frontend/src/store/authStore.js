@@ -80,7 +80,11 @@ export const useAuthStore = create(
             refreshToken
           })
 
-          set({ accessToken: data.accessToken })
+          // Update both token and user data (includes permissions from role)
+          set({
+            accessToken: data.accessToken,
+            user: data.user || get().user
+          })
           axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`
 
           return data.accessToken

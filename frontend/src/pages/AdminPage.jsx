@@ -1,8 +1,25 @@
 import { useState, useEffect } from 'react'
-import { Settings, Plus, Trash2, AlertCircle, Loader, ChevronDown, ChevronUp } from 'lucide-react'
+import { Settings, Plus, Trash2, AlertCircle, Loader, ChevronDown, ChevronUp, Shield, Save } from 'lucide-react'
 import { deliveryStatusApi } from '../services/deliveryStatusApi'
+import { rolesApi } from '../services/rolesApi'
+
+// Módulos disponibles
+const ALL_MODULES = [
+  { value: 'dashboard', label: '📊 Dashboard', icon: '📊' },
+  { value: 'trafico', label: '🚗 Tráfico', icon: '🚗' },
+  { value: 'historicoRutero', label: '📜 Histórico Rutero', icon: '📜' },
+  { value: 'cargaInformacion', label: '📤 Carga de Información', icon: '📤' }
+]
+
+const ROLE_COLORS = {
+  ADMIN: 'bg-red-100 text-red-800 border-red-300',
+  ANALISTA: 'bg-blue-100 text-blue-800 border-blue-300',
+  IN_HOUSE: 'bg-green-100 text-green-800 border-green-300',
+  CUSTOMER: 'bg-gray-100 text-gray-800 border-gray-300'
+}
 
 export default function AdminPage() {
+  // Estados para Delivery Status
   const [statuses, setStatuses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -11,10 +28,17 @@ export default function AdminPage() {
   const [successMessage, setSuccessMessage] = useState('')
   const [expandedStatus, setExpandedStatus] = useState(null)
   const [reasonsLoading, setReasonsLoading] = useState({})
-  const [statusReasons, setStatusReasons] = useState({}) // { statusId: [reasons] }
-  const [showReasonForm, setShowReasonForm] = useState(null) // statusId or null
+  const [statusReasons, setStatusReasons] = useState({})
+  const [showReasonForm, setShowReasonForm] = useState(null)
   const [reasonFormSubmitting, setReasonFormSubmitting] = useState(false)
-  const [deletingReason, setDeletingReason] = useState(null) // reasonId being deleted
+  const [deletingReason, setDeletingReason] = useState(null)
+
+  // Estados para Roles y Permisos
+  const [roles, setRoles] = useState([])
+  const [rolesLoading, setRolesLoading] = useState(true)
+  const [editingRole, setEditingRole] = useState(null)
+  const [editingModules, setEditingModules] = useState([])
+  const [savingRole, setSavingRole] = useState(false)
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -38,7 +62,21 @@ export default function AdminPage() {
 
   useEffect(() => {
     loadStatuses()
+    loadRoles()
   }, [])
+
+  const loadRoles = async () => {
+    try {
+      setRolesLoading(true)
+      const data = await rolesApi.getAllRoles()
+      setRoles(data)
+    } catch (err) {
+      console.error('Error cargando roles:', err)
+      setError('Error al cargar roles')
+    } finally {
+      setRolesLoading(false)
+    }
+  }
 
   const loadStatuses = async () => {
     try {
@@ -192,6 +230,52 @@ export default function AdminPage() {
     } finally {
       setDeletingReason(null)
     }
+  }
+
+  // Handlers para Roles
+  const handleEditRole = (role) => {
+    setEditingRole(role.role)
+    setEditingModules([...role.modules])
+  }
+
+  const handleToggleModule = (module) => {
+    setEditingModules(prev =>
+      prev.includes(module)
+        ? prev.filter(m => m !== module)
+        : [...prev, module]
+    )
+  }
+
+  const handleSaveRole = async () => {
+    if (!editingRole) return
+
+    setSavingRole(true)
+    setError(null)
+
+    try {
+      const role = roles.find(r => r.role === editingRole)
+      await rolesApi.updateRoleModules(editingRole, editingModules, role?.description)
+
+      setSuccessMessage(`Rol ${editingRole} actualizado exitosamente`)
+      setEditingRole(null)
+      setEditingModules([])
+
+      // Reload roles
+      await loadRoles()
+
+      // Clear message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000)
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al actualizar rol')
+      console.error(err)
+    } finally {
+      setSavingRole(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingRole(null)
+    setEditingModules([])
   }
 
   return (
@@ -502,6 +586,122 @@ export default function AdminPage() {
           <li>• El color solo es para referencia visual</li>
           <li>• Los usuarios con permiso pueden asignar estados a entregas en Tráfico</li>
         </ul>
+      </div>
+
+      {/* SECCIÓN: Configuración de Roles y Permisos */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Shield className="w-6 h-6 text-red-500" />
+          <h2 className="text-xl font-bold text-gray-900">Roles y Permisos</h2>
+        </div>
+
+        <p className="text-gray-600 text-sm mb-6">
+          Los permisos se asignan automáticamente según el rol del usuario. Edita los módulos de cada rol:
+        </p>
+
+        {/* Grid de Roles Editable */}
+        {rolesLoading ? (
+          <div className="text-center py-12">
+            <Loader className="w-8 h-8 animate-spin mx-auto text-gray-400" />
+            <p className="text-gray-600 mt-2">Cargando roles...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {roles.map(role => (
+              <div
+                key={role.role}
+                className={`rounded-lg border-2 p-4 space-y-3 ${ROLE_COLORS[role.role]}`}
+              >
+                {/* Rol Header */}
+                <div>
+                  <h3 className="text-lg font-bold">{role.role}</h3>
+                  <p className="text-xs opacity-90 mt-1">{role.description}</p>
+                </div>
+
+                {/* Edit Mode */}
+                {editingRole === role.role ? (
+                  <div className="space-y-3 border-t border-current border-opacity-20 pt-3">
+                    <p className="text-xs font-semibold opacity-75">Módulos disponibles:</p>
+                    <div className="space-y-2">
+                      {ALL_MODULES.map(module => (
+                        <label key={module.value} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editingModules.includes(module.value)}
+                            onChange={() => handleToggleModule(module.value)}
+                            className="w-4 h-4 rounded"
+                          />
+                          <span className="text-sm">{module.label}</span>
+                        </label>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={handleSaveRole}
+                        disabled={savingRole}
+                        className="flex-1 flex items-center justify-center gap-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-3 rounded text-sm transition-colors"
+                      >
+                        {savingRole ? (
+                          <>
+                            <Loader className="w-3 h-3 animate-spin" />
+                            Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-3 h-3" />
+                            Guardar
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        disabled={savingRole}
+                        className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-400 text-gray-900 font-semibold py-2 px-3 rounded text-sm transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // View Mode
+                  <div className="space-y-3 border-t border-current border-opacity-20 pt-3">
+                    <p className="text-xs font-semibold opacity-75">Módulos ({role.modules.length}):</p>
+                    <ul className="space-y-1">
+                      {role.modules.map(module => {
+                        const m = ALL_MODULES.find(x => x.value === module)
+                        return (
+                          <li key={module} className="flex items-center gap-2 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-75"></span>
+                            <span>{m?.label || module}</span>
+                          </li>
+                        )
+                      })}
+                    </ul>
+
+                    <button
+                      onClick={() => handleEditRole(role)}
+                      className="w-full text-blue-600 hover:text-blue-700 font-semibold text-sm border border-current border-opacity-50 rounded py-1 px-2 hover:bg-white hover:bg-opacity-30 transition-colors"
+                    >
+                      ✏️ Editar Módulos
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Información importante */}
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="text-sm font-semibold text-blue-900 mb-2">💡 Cómo cambiar permisos a un usuario:</h4>
+          <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+            <li><strong>1. Ir a Gestión de Usuarios</strong></li>
+            <li><strong>2. Editar el usuario</strong></li>
+            <li><strong>3. Cambiar su Rol</strong> (ADMIN, ANALISTA, IN_HOUSE, CUSTOMER)</li>
+            <li><strong>4. El usuario obtiene automáticamente los módulos del nuevo rol</strong> en el próximo login</li>
+          </ol>
+        </div>
       </div>
     </div>
   )

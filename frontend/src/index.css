@@ -8,6 +8,10 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 14px;
+}
+
 html, body, #root {
   height: 100%;
   width: 100%;
@@ -17,6 +21,12 @@ body {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 13px;
+  }
 }
 
 /* Leaflet custom styles */

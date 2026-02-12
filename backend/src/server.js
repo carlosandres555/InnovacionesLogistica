@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.js'
 import usersRoutes from './routes/users.js'
 import smRoutes from './routes/sm.js'
 import deliveryStatusRoutes from './routes/deliveryStatus.js'
+import rolesRoutes from './routes/roles.js'
 
 // Import middleware
 import { authenticateToken } from './middleware/auth.js'
@@ -50,6 +51,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/users', authenticateToken, usersRoutes)
 app.use('/api/sm', authenticateToken, smRoutes)
 app.use('/api/delivery-status', authenticateToken, deliveryStatusRoutes)
+app.use('/api/roles', authenticateToken, rolesRoutes)
 
 // 404 handler
 app.use((req, res) => {

@@ -249,3 +249,12 @@ model EntregaDeliveryStatus {
   @@index([statusId])
   @@index([reasonId])
 }
+
+model RolePermission {
+  id String @id @default(cuid())
+  role String @unique // ADMIN, ANALISTA, IN_HOUSE, CUSTOMER
+  modules String[] @default([]) // Array de módulos: dashboard, trafico, historicoRutero, cargaInformacion
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

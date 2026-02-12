@@ -18,9 +18,8 @@ export default function TraficoPage() {
   const [selectedEntrega, setSelectedEntrega] = useState(null)
   const [progressByRoute, setProgressByRoute] = useState({})
 
-  // Filtros
+  // Filtros (sin fecha - solo hoy)
   const [filters, setFilters] = useState({
-    fecha: '',
     ruta: '',
     ciudad: '',
     codCliente: '',
@@ -82,9 +81,11 @@ export default function TraficoPage() {
   }
 
   const handleModalSave = async () => {
-    // Reload the status for the updated entrega
+    // Reload the status for the updated entrega and refresh progress
     if (selectedEntrega) {
       await loadEntregaStatus(selectedEntrega.id)
+      // Refresh progress data for the route
+      await loadTraficoData()
     }
   }
 
@@ -164,9 +165,9 @@ export default function TraficoPage() {
       {/* Header */}
       <div>
         <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent mb-2">
-          Tráfico
+          Tráfico - Hoy
         </h1>
-        <p className="text-gray-600">Monitoreo y seguimiento de cargas</p>
+        <p className="text-gray-600">Monitoreo y seguimiento de entregas del día</p>
       </div>
 
       {/* Filtros */}
@@ -176,20 +177,7 @@ export default function TraficoPage() {
           <h3 className="font-semibold text-gray-900">Filtros</h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fecha
-            </label>
-            <input
-              type="text"
-              placeholder="ej: 11-Feb"
-              value={filters.fecha}
-              onChange={(e) => handleFilterChange('fecha', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Ruta

@@ -5,6 +5,8 @@ import {
   getSMDetails,
   uploadSMFile,
   getTraficoData,
+  getHistoricoData,
+  exportHistoricoExcel,
 } from "../controllers/smController.js";
 
 const router = express.Router();
@@ -37,7 +39,13 @@ router.get("/uploads/:uploadId/details", getSMDetails);
 // POST - Subir archivo SM
 router.post("/upload", upload.single("file"), uploadSMFile);
 
-// GET - Obtener datos para módulo de Tráfico
+// GET - Obtener datos para módulo de Tráfico (solo entregas de hoy)
 router.get("/trafico", getTraficoData);
+
+// GET - Obtener datos históricos (solo entregas pasadas)
+router.get("/historico", getHistoricoData);
+
+// GET - Exportar histórico a Excel
+router.get("/historico/export", exportHistoricoExcel);
 
 export default router;

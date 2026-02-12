@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { authenticateToken } from '../middleware/auth.js'
+import { getPermissionsByRole } from '../config/rolePermissions.js'
 
 const router = express.Router()
 const prisma = new PrismaClient()
@@ -64,6 +65,9 @@ router.post('/register', async (req, res, next) => {
       { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
     )
 
+    // Get permissions based on role
+    const permissions = getPermissionsByRole(user.role)
+
     res.status(201).json({
       message: 'User registered successfully',
       accessToken,
@@ -74,7 +78,7 @@ router.post('/register', async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        permissions: user.permissions
+        permissions
       }
     })
   } catch (error) {
@@ -131,6 +135,9 @@ router.post('/login', async (req, res, next) => {
       { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
     )
 
+    // Get permissions based on role
+    const permissions = getPermissionsByRole(user.role)
+
     res.json({
       message: 'Login successful',
       accessToken,
@@ -141,7 +148,7 @@ router.post('/login', async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        permissions: user.permissions
+        permissions
       }
     })
   } catch (error) {
@@ -164,18 +171,40 @@ router.post('/refresh', async (req, res, next) => {
       return res.status(401).json({ error: 'Refresh token required' })
     }
 
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || 'refresh-secret', (err, user) => {
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || 'refresh-secret', async (err, decoded) => {
       if (err) {
         return res.status(403).json({ error: 'Invalid refresh token' })
       }
 
+      // Get user data to include in new access token
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.id }
+      })
+
+      if (!user) {
+        return res.status(401).json({ error: 'User not found' })
+      }
+
       const newAccessToken = jwt.sign(
-        { id: user.id },
+        { id: user.id, email: user.email, role: user.role, companyId: user.companyId },
         process.env.JWT_SECRET || 'secret',
         { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
       )
 
-      res.json({ accessToken: newAccessToken })
+      // Get permissions based on role
+      const permissions = getPermissionsByRole(user.role)
+
+      res.json({
+        accessToken: newAccessToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          permissions
+        }
+      })
     })
   } catch (error) {
     next(error)

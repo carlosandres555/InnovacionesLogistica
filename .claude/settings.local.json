@@ -57,7 +57,10 @@
       "Bash(ssh:*)",
       "Bash(git -C /Users/carlosrodriguez/Project/DistribucionCosta branch -a)",
       "Bash(git -C /Users/carlosrodriguez/Project/DistribucionCosta remote -v)",
-      "Bash(npx prisma db seed:*)"
+      "Bash(npx prisma db seed:*)",
+      "Bash(npm run db:generate:*)",
+      "Bash(npm run:*)",
+      "Bash(cat:*)"
     ]
   }
 }
