@@ -193,8 +193,8 @@ export default function TraficoPage() {
                               <p className="text-gray-900">{entrega.ruta} - {entrega.ciudad}</p>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-600 font-semibold">Secuencia / Total</p>
-                              <p className="text-gray-900">{entrega.secuencia} / {entrega.totalGeneral}</p>
+                              <p className="text-xs text-gray-600 font-semibold">Secuencia</p>
+                              <p className="text-gray-900">{entrega.secuencia}</p>
                             </div>
                             <div>
                               <p className="text-xs text-gray-600 font-semibold">Productos</p>
