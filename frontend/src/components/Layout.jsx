@@ -33,24 +33,24 @@ export default function Layout({ children }) {
   ]
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100">
+    <div className="flex h-screen bg-gray-50">
       {/* Sidebar - Fixed on mobile, relative on desktop */}
       <aside
         className={`${
           sidebarOpen ? 'block' : 'hidden'
-        } fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-red-900 via-red-800 to-red-950 text-white overflow-y-auto lg:relative lg:block transition-all duration-300 shadow-2xl`}
+        } fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white overflow-y-auto lg:relative lg:block transition-all duration-300 shadow-xl`}
       >
         {/* Logo Section */}
-        <div className="p-6 border-b border-red-700/30">
+        <div className="p-6 border-b border-slate-700/30">
           <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-red-500 to-rose-400">
+            <div className="p-2 rounded-lg bg-blue-600">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold text-white">
               Innovaciones
             </h1>
           </div>
-          <p className="text-xs text-red-200/70">Logística Moderna</p>
+          <p className="text-xs text-slate-400">Logística Moderna</p>
         </div>
 
         {/* Navigation */}
@@ -62,9 +62,9 @@ export default function Layout({ children }) {
                 key={item.href}
                 to={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/50 hover:text-white transition-all duration-200 text-sm sm:text-base group"
+                className="flex items-center px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors duration-200 text-sm sm:text-base group"
               >
-                <Icon className="w-5 h-5 mr-3 flex-shrink-0 group-hover:text-red-300" />
+                <Icon className="w-5 h-5 mr-3 flex-shrink-0 group-hover:text-blue-400 transition-colors" />
                 <span className="font-medium">{item.label}</span>
               </Link>
             )
@@ -72,12 +72,12 @@ export default function Layout({ children }) {
         </nav>
 
         {/* Bottom Section */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-red-700/30 bg-gradient-to-t from-red-950 to-transparent">
+        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-slate-700/30 bg-slate-900">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/50 hover:text-white transition-all duration-200 text-sm font-medium group"
+            className="flex items-center w-full px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors duration-200 text-sm font-medium group"
           >
-            <LogOut className="w-5 h-5 mr-3 flex-shrink-0 group-hover:text-red-300" />
+            <LogOut className="w-5 h-5 mr-3 flex-shrink-0 group-hover:text-blue-400 transition-colors" />
             <span>Salir</span>
           </button>
         </div>
@@ -86,38 +86,38 @@ export default function Layout({ children }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile/Tablet header */}
-        <div className="lg:hidden bg-gradient-to-r from-red-900 to-red-800 shadow-lg border-b border-red-700/30">
+        <div className="lg:hidden bg-slate-900 shadow-lg border-b border-slate-700/30">
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-red-100 p-2 hover:bg-red-700/50 rounded-lg transition-all lg:hidden"
+              className="text-slate-300 p-2 hover:bg-slate-800 rounded-lg transition-colors lg:hidden"
               aria-label="Toggle menu"
             >
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
-            <div className="text-sm text-red-100 text-center flex-1 font-medium">
+            <div className="text-sm text-slate-300 text-center flex-1 font-medium">
               <span className="block sm:inline">{user?.firstName}</span>
-              <span className="hidden sm:inline sm:ml-2 text-red-200/70">{user?.lastName}</span>
+              <span className="hidden sm:inline sm:ml-2 text-slate-400">{user?.lastName}</span>
             </div>
           </div>
         </div>
 
         {/* Desktop header */}
-        <div className="hidden lg:block bg-gradient-to-r from-slate-900 to-slate-800 border-b border-red-700/20 shadow-lg">
+        <div className="hidden lg:block bg-slate-900 border-b border-slate-700/30 shadow-lg">
           <div className="px-6 py-5 flex items-center justify-between">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">
+            <h2 className="text-xl font-bold text-white">
               {user?.company?.name || 'Panel de Control'}
             </h2>
             <div className="flex items-center gap-6">
               <div>
-                <p className="text-sm font-medium text-red-200">
+                <p className="text-sm font-medium text-slate-300">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-xs text-red-300/60 capitalize">{user?.role}</p>
+                <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-2.5 text-red-200 hover:text-red-100 hover:bg-red-700/30 rounded-lg transition-all duration-200"
+                className="p-2.5 text-slate-400 hover:text-slate-300 hover:bg-slate-800 rounded-lg transition-colors duration-200"
                 title="Salir"
               >
                 <LogOut className="w-5 h-5" />

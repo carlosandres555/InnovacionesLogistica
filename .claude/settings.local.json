@@ -60,7 +60,8 @@
       "Bash(npx prisma db seed:*)",
       "Bash(npm run db:generate:*)",
       "Bash(npm run:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(grep:*)"
     ]
   }
 }

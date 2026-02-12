@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { X, Loader } from 'lucide-react'
 import { deliveryStatusApi } from '../services/deliveryStatusApi'
+import Button from './Button'
+import Input from './Input'
 
 export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }) {
   const [statuses, setStatuses] = useState([])
@@ -119,8 +121,8 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in-up">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-slide-in-left">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">
@@ -246,28 +248,23 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
 
           {/* Buttons */}
           <div className="flex gap-3 pt-4">
-            <button
+            <Button
               type="submit"
               disabled={submitting || loading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+              loading={submitting}
+              className="flex-1"
             >
-              {submitting ? (
-                <>
-                  <Loader className="w-4 h-4 animate-spin" />
-                  Guardando...
-                </>
-              ) : (
-                'Guardar'
-              )}
-            </button>
-            <button
+              {!submitting && 'Guardar'}
+            </Button>
+            <Button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-300 text-gray-900 font-semibold py-2 px-4 rounded-lg transition-colors"
+              variant="secondary"
+              className="flex-1"
             >
               Cancelar
-            </button>
+            </Button>
           </div>
         </form>
       </div>

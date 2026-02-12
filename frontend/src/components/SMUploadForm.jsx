@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Upload, AlertCircle, CheckCircle, FileUp } from 'lucide-react'
 import { smApi } from '../services/smApi'
+import Button from './Button'
 
 export default function SMUploadForm({ onUploadSuccess }) {
   const [file, setFile] = useState(null)
@@ -153,14 +154,16 @@ export default function SMUploadForm({ onUploadSuccess }) {
         </div>
 
         {/* Botón de envío */}
-        <button
+        <Button
           type="submit"
           disabled={!file || loading}
-          className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+          loading={loading}
+          size="lg"
+          className="w-full"
         >
           <FileUp className="w-5 h-5" />
-          {loading ? 'Procesando...' : 'Subir Archivo'}
-        </button>
+          {!loading && 'Subir Archivo'}
+        </Button>
       </form>
 
       {/* Mensajes de error */}
