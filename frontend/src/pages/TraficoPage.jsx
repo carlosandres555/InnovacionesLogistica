@@ -60,6 +60,7 @@ export default function TraficoPage() {
   // Convertir a array y ordenar
   const cargasArray = Object.entries(groupedByNumCarga).map(([numCarga, entregas]) => ({
     numCarga,
+    placa: [...new Set(entregas.map(e => e.cargas))].join(' / '), // Placas únicas
     entregas,
     totalEntregas: entregas.length,
     totalCarga: entregas.reduce((sum, e) => sum + e.totalGeneral, 0),
@@ -154,8 +155,13 @@ export default function TraficoPage() {
                   <div className="flex items-center gap-3 flex-1 text-left">
                     <Truck className="w-5 h-5 text-blue-600" />
                     <div>
-                      <p className="font-bold text-gray-900"># {carga.numCarga}</p>
-                      <p className="text-xs text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-gray-900"># {carga.numCarga}</p>
+                        <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
+                          {carga.placa}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">
                         {carga.totalEntregas} entregas • Total: {carga.totalCarga} unidades
                       </p>
                     </div>
