@@ -309,7 +309,7 @@ export const uploadSMFile = async (req, res, next) => {
 // Get all SM details for tráfico (with filters)
 export const getTraficoData = async (req, res, next) => {
   try {
-    const { fecha, ruta, ciudad, page = 1, limit = 50 } = req.query;
+    const { fecha, ruta, ciudad, codCliente, page = 1, limit = 50 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Construir filtros
@@ -318,6 +318,7 @@ export const getTraficoData = async (req, res, next) => {
     if (fecha) filters.fecha = fecha;
     if (ruta) filters.ruta = { contains: ruta, mode: "insensitive" };
     if (ciudad) filters.ciudad = { contains: ciudad, mode: "insensitive" };
+    if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
 
     const [details, total] = await Promise.all([
       prisma.sMDetail.findMany({

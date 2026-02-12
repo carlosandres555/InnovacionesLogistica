@@ -14,7 +14,8 @@ export default function TraficoPage() {
   const [filters, setFilters] = useState({
     fecha: '',
     ruta: '',
-    ciudad: ''
+    ciudad: '',
+    codCliente: ''
   })
 
   useEffect(() => {
@@ -85,7 +86,7 @@ export default function TraficoPage() {
           <h3 className="font-semibold text-gray-900">Filtros</h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Fecha
@@ -121,6 +122,19 @@ export default function TraficoPage() {
               placeholder="ej: Barranquilla"
               value={filters.ciudad}
               onChange={(e) => handleFilterChange('ciudad', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Cód. Cliente
+            </label>
+            <input
+              type="text"
+              placeholder="ej: 110501"
+              value={filters.codCliente}
+              onChange={(e) => handleFilterChange('codCliente', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
