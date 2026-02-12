@@ -45,6 +45,7 @@ model User {
   companyId String?
   assignedShipments Shipment[] @relation("AssignedDriver")
   drivingVehicles Vehicle[] @relation("CurrentDriver")
+  smUploads SMUpload[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   lastLogin DateTime?
@@ -72,6 +73,7 @@ model Company {
   vehicles Vehicle[]
   shipments Shipment[]
   locations Location[]
+  smUploads SMUpload[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([email])
@@ -164,4 +166,44 @@ model FileUpload {
   fileType String
   uploadedAt DateTime @default(now())
   expiresAt DateTime?
+}
+
+model SMUpload {
+  id String @id @default(cuid())
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  fileName String
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  uploadedById String?
+  status String @default("completed") // completed, pending, error
+  totalRecords Int @default(0)
+  errorMessage String?
+  details SMDetail[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([companyId])
+  @@index([createdAt])
+}
+
+model SMDetail {
+  id String @id @default(cuid())
+  smUpload SMUpload @relation(fields: [smUploadId], references: [id], onDelete: Cascade)
+  smUploadId String
+  fecha String
+  ruta String
+  ciudad String
+  cargas String
+  nombreCliente String
+  codCliente String
+  secuencia String
+  alqueria Int @default(0)
+  yogurt Int @default(0)
+  quesos Int @default(0)
+  totalGeneral Int @default(0)
+  numCarga String @unique // Clave única
+  ordenCompra String?
+  createdAt DateTime @default(now())
+  @@index([smUploadId])
+  @@index([numCarga])
+  @@index([fecha])
 }

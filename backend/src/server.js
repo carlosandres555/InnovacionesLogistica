@@ -11,6 +11,7 @@ dotenv.config()
 // Import routes
 import authRoutes from './routes/auth.js'
 import usersRoutes from './routes/users.js'
+import smRoutes from './routes/sm.js'
 
 // Import middleware
 import { authenticateToken } from './middleware/auth.js'
@@ -46,6 +47,7 @@ app.use('/api/auth', authRoutes)
 
 // Protected routes (require authentication)
 app.use('/api/users', authenticateToken, usersRoutes)
+app.use('/api/sm', authenticateToken, smRoutes)
 
 // 404 handler
 app.use((req, res) => {
