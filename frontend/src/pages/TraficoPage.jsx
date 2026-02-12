@@ -279,10 +279,9 @@ export default function TraficoPage() {
 
                 {/* Detalles de entregas */}
                 {expandedCarga === carga.numCarga && (
-                  <div className="border-t border-gray-200 bg-gray-50">
-                    <div className="divide-y divide-gray-200">
-                      {carga.entregas.map((entrega) => (
-                        <div key={entrega.id} className="px-6 py-4 hover:bg-gray-100 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="border-t border-gray-200 bg-gradient-to-b from-gray-50 to-white p-3 space-y-3">
+                    {carga.entregas.map((entrega, index) => (
+                        <div key={entrega.id} className="px-5 py-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md hover:bg-blue-50/30 transition-all duration-200 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                           {/* Información de entrega - Lado izquierdo */}
                           <div className="flex-1">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
@@ -352,7 +351,6 @@ export default function TraficoPage() {
                           </div>
                         </div>
                       ))}
-                    </div>
                   </div>
                 )}
               </div>
