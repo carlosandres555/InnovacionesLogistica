@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Loader } from 'lucide-react'
+import { contractorsApi } from '../services/contractorsApi'
 
 const ROLES = ['CUSTOMER', 'IN_HOUSE', 'ANALISTA', 'ADMIN']
 
@@ -10,8 +11,12 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
     email: '',
     password: '',
     phone: '',
-    role: 'CUSTOMER'
+    role: 'CUSTOMER',
+    contractorId: ''
   })
+
+  const [contractors, setContractors] = useState([])
+  const [loadingContractors, setLoadingContractors] = useState(false)
 
   const [errors, setErrors] = useState({})
   const isEditing = initialData?.id
@@ -24,7 +29,8 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
         email: initialData.email || '',
         password: '',
         phone: initialData.phone || '',
-        role: initialData.role || 'CUSTOMER'
+        role: initialData.role || 'CUSTOMER',
+        contractorId: initialData.contractorId || ''
       })
     } else {
       setFormData({
@@ -33,11 +39,27 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
         email: '',
         password: '',
         phone: '',
-        role: 'CUSTOMER'
+        role: 'CUSTOMER',
+        contractorId: ''
       })
     }
     setErrors({})
+
+    // Cargar contratistas
+    loadContractors()
   }, [initialData, isOpen])
+
+  const loadContractors = async () => {
+    try {
+      setLoadingContractors(true)
+      const data = await contractorsApi.getAllContractors()
+      setContractors(data)
+    } catch (err) {
+      console.error('Error cargando contratistas:', err)
+    } finally {
+      setLoadingContractors(false)
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -213,6 +235,39 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, isLoading, in
               Los módulos se asignan automáticamente según el rol
             </p>
           </div>
+
+          {/* Contractor (solo para IN_HOUSE) */}
+          {formData.role === 'IN_HOUSE' && (
+            <div>
+              <label className="block text-sm font-medium text-slate-900 mb-2">
+                Empresa Contratista *
+              </label>
+              {loadingContractors ? (
+                <div className="w-full px-4 py-3 flex items-center gap-2 text-sm bg-gray-50 border border-blue-200 rounded-xl text-gray-600">
+                  <Loader className="w-4 h-4 animate-spin" />
+                  Cargando empresas...
+                </div>
+              ) : (
+                <select
+                  name="contractorId"
+                  value={formData.contractorId}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 text-sm bg-gray-50 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 text-gray-900 transition"
+                >
+                  <option value="">Seleccionar empresa...</option>
+                  {contractors.map(contractor => (
+                    <option key={contractor.id} value={contractor.id}>
+                      {contractor.name} ({contractor._count?.vehicles || 0} vehículos)
+                    </option>
+                  ))}
+                </select>
+              )}
+              <p className="text-xs text-gray-500 mt-2">
+                El usuario solo verá entregas de esta empresa
+              </p>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 sm:pt-6 border-t border-gray-200">
