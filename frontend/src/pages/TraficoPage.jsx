@@ -728,6 +728,7 @@ export default function TraficoPage() {
           }}
           onSave={handleModalSave}
           showFechaEntrega={activeTab === 'pendiente'}
+          autoFechaHoy={activeTab === 'hoy'}
         />
       )}
     </div>

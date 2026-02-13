@@ -689,6 +689,9 @@ export const exportHistoricoExcel = async (req, res, next) => {
       Estado: d.deliveryStatus?.status?.nombre || "Sin asignar",
       Motivo: d.deliveryStatus?.reason?.nombre || "N/A",
       Observaciones: d.deliveryStatus?.observaciones || "N/A",
+      "Fecha Entrega": d.deliveryStatus?.fechaEntrega
+        ? new Date(d.deliveryStatus.fechaEntrega).toLocaleDateString("es-CO")
+        : "N/A",
       "Recogió Devolución": d.deliveryStatus?.recogioDevoluccion ? "Sí" : "No",
       "Actualizado Por": d.deliveryStatus?.updatedBy
         ? `${d.deliveryStatus.updatedBy.firstName} ${d.deliveryStatus.updatedBy.lastName}`
@@ -720,6 +723,7 @@ export const exportHistoricoExcel = async (req, res, next) => {
       { wch: 15 }, // Estado
       { wch: 20 }, // Motivo
       { wch: 20 }, // Observaciones
+      { wch: 15 }, // Fecha Entrega
       { wch: 15 }, // Recogió Devolución
       { wch: 20 }, // Actualizado Por
       { wch: 22 }, // Fecha Actualización

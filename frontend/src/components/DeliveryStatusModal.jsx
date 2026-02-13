@@ -4,19 +4,25 @@ import { deliveryStatusApi } from '../services/deliveryStatusApi'
 import Button from './Button'
 import Input from './Input'
 
-export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave, showFechaEntrega = false }) {
+export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave, showFechaEntrega = false, autoFechaHoy = false }) {
   const [statuses, setStatuses] = useState([])
   const [reasons, setReasons] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
 
+  // Obtener fecha de hoy en formato YYYY-MM-DD
+  const getTodayDate = () => {
+    const today = new Date()
+    return today.toISOString().split('T')[0]
+  }
+
   const [formData, setFormData] = useState({
     statusId: '',
     reasonId: '',
     observaciones: '',
     recogioDevoluccion: false,
-    fechaEntrega: '',
+    fechaEntrega: autoFechaHoy ? getTodayDate() : '',
   })
 
   useEffect(() => {
@@ -234,21 +240,25 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave, 
               </div>
 
               {/* Fecha de Entrega - Conditional */}
-              {showFechaEntrega && (
+              {(showFechaEntrega || autoFechaHoy) && (
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Fecha de Entrega
+                    Fecha de Entrega {autoFechaHoy && '(Hoy)'}
                   </label>
                   <input
                     type="date"
                     name="fechaEntrega"
                     value={formData.fechaEntrega}
                     onChange={handleInputChange}
-                    disabled={submitting}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={submitting || autoFechaHoy}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      autoFechaHoy ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Ingrese la fecha real de entrega para entregas atrasadas
+                    {autoFechaHoy
+                      ? 'Fecha de entrega asignada automáticamente (hoy)'
+                      : 'Ingrese la fecha real de entrega para entregas atrasadas'}
                   </p>
                 </div>
               )}
