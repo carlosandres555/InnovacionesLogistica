@@ -111,6 +111,7 @@ export const createUser = async (req, res, next) => {
       role = "CUSTOMER",
       permissions,
       companyId,
+      contractorId,
     } = req.body;
 
     // Check if email already exists
@@ -136,6 +137,7 @@ export const createUser = async (req, res, next) => {
         role,
         permissions: permissions || { modules: ["dashboard"] },
         companyId: companyId || null,
+        contractorId: contractorId || null,
       },
       select: {
         id: true,
@@ -146,7 +148,15 @@ export const createUser = async (req, res, next) => {
         role: true,
         isActive: true,
         permissions: true,
+        companyId: true,
+        contractorId: true,
         company: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        contractor: {
           select: {
             id: true,
             name: true,
@@ -178,6 +188,7 @@ export const updateUser = async (req, res, next) => {
       permissions,
       isActive,
       companyId,
+      contractorId,
     } = req.body;
 
     // Check if user exists
@@ -212,6 +223,7 @@ export const updateUser = async (req, res, next) => {
         ...(permissions && { permissions }),
         ...(isActive !== undefined && { isActive }),
         ...(companyId !== undefined && { companyId }),
+        ...(contractorId !== undefined && { contractorId }),
       },
       select: {
         id: true,
@@ -222,7 +234,15 @@ export const updateUser = async (req, res, next) => {
         role: true,
         isActive: true,
         permissions: true,
+        companyId: true,
+        contractorId: true,
         company: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        contractor: {
           select: {
             id: true,
             name: true,
