@@ -32,7 +32,15 @@ export const getUsers = async (req, res, next) => {
           role: true,
           isActive: true,
           permissions: true,
+          companyId: true,
+          contractorId: true,
           company: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          contractor: {
             select: {
               id: true,
               name: true,
@@ -78,7 +86,15 @@ export const getUserById = async (req, res, next) => {
         role: true,
         isActive: true,
         permissions: true,
+        companyId: true,
+        contractorId: true,
         company: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        contractor: {
           select: {
             id: true,
             name: true,
