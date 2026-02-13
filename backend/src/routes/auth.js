@@ -4,10 +4,33 @@ import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { authenticateToken } from '../middleware/auth.js'
-import { getPermissionsByRole } from '../config/rolePermissions.js'
 
 const router = express.Router()
 const prisma = new PrismaClient()
+
+// Obtener permisos de un rol desde la BD
+const getPermissionsByRole = async (roleName) => {
+  try {
+    const rolePermission = await prisma.rolePermission.findUnique({
+      where: { role: roleName }
+    })
+
+    if (rolePermission) {
+      return {
+        modules: rolePermission.modules || [],
+        description: rolePermission.description
+      }
+    }
+  } catch (error) {
+    console.error('Error obteniendo permisos de BD:', error)
+  }
+
+  // Fallback: retornar módulos vacíos si no existe
+  return {
+    modules: [],
+    description: 'Rol no configurado'
+  }
+}
 
 // Validation schemas
 const RegisterSchema = z.object({
@@ -65,8 +88,8 @@ router.post('/register', async (req, res, next) => {
       { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
     )
 
-    // Get permissions based on role
-    const permissions = getPermissionsByRole(user.role)
+    // Get permissions from database
+    const permissions = await getPermissionsByRole(user.role)
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -135,8 +158,8 @@ router.post('/login', async (req, res, next) => {
       { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
     )
 
-    // Get permissions based on role
-    const permissions = getPermissionsByRole(user.role)
+    // Get permissions from database
+    const permissions = await getPermissionsByRole(user.role)
 
     res.json({
       message: 'Login successful',
@@ -191,8 +214,8 @@ router.post('/refresh', async (req, res, next) => {
         { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
       )
 
-      // Get permissions based on role
-      const permissions = getPermissionsByRole(user.role)
+      // Get permissions from database
+      const permissions = await getPermissionsByRole(user.role)
 
       res.json({
         accessToken: newAccessToken,

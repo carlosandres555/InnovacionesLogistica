@@ -43,6 +43,8 @@ model User {
   ownedCompany Company? @relation("CompanyOwner")
   company Company? @relation("CompanyEmployees", fields: [companyId], references: [id], onDelete: SetNull)
   companyId String?
+  contractor Company? @relation("ContractorInHouse", fields: [contractorId], references: [id], onDelete: SetNull)
+  contractorId String? // Para usuarios IN_HOUSE: empresa contratista asignada
   assignedShipments Shipment[] @relation("AssignedDriver")
   drivingVehicles Vehicle[] @relation("CurrentDriver")
   smUploads SMUpload[]
@@ -52,6 +54,7 @@ model User {
   lastLogin DateTime?
   @@index([email])
   @@index([companyId])
+  @@index([contractorId])
 }
 
 model Company {
@@ -71,6 +74,7 @@ model Company {
   logo String?
   isActive Boolean @default(true)
   employees User[] @relation("CompanyEmployees")
+  inHouseUsers User[] @relation("ContractorInHouse") // Usuarios IN_HOUSE asignados a esta contratista
   vehicles Vehicle[]
   shipments Shipment[]
   locations Location[]
