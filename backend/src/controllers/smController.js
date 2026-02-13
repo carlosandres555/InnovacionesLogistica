@@ -343,7 +343,7 @@ export const uploadSMFile = async (req, res, next) => {
 // Get all SM details for pending traffic (entregas without status from past dates)
 export const getPendienteData = async (req, res, next) => {
   try {
-    const { ruta, ciudad, codCliente, nombreCliente, page = 1, limit = 50 } = req.query;
+    const { ruta, ciudad, codCliente, nombreCliente, allowedPlates, page = 1, limit = 50 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Construir filtros
@@ -353,6 +353,12 @@ export const getPendienteData = async (req, res, next) => {
     if (ciudad) filters.ciudad = { contains: ciudad, mode: "insensitive" };
     if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
     if (nombreCliente) filters.nombreCliente = { contains: nombreCliente, mode: "insensitive" };
+
+    // Filtro de placas para IN_HOUSE
+    if (allowedPlates) {
+      const platesArray = allowedPlates.split(',').map(p => p.trim());
+      filters.cargas = { in: platesArray };
+    }
 
     // Obtener todos los registros que NO tienen estado asignado
     const allDetails = await prisma.sMDetail.findMany({
@@ -496,7 +502,7 @@ export const getTraficoData = async (req, res, next) => {
 // Get historical SM details (only past records - read-only)
 export const getHistoricoData = async (req, res, next) => {
   try {
-    const { fechaDesde, fechaHasta, numCarga, codCliente, nombreCliente, page = 1, limit = 100 } = req.query;
+    const { fechaDesde, fechaHasta, numCarga, codCliente, nombreCliente, allowedPlates, page = 1, limit = 100 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Construir filtros
@@ -505,6 +511,12 @@ export const getHistoricoData = async (req, res, next) => {
     if (numCarga) filters.numCarga = { contains: numCarga, mode: "insensitive" };
     if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
     if (nombreCliente) filters.nombreCliente = { contains: nombreCliente, mode: "insensitive" };
+
+    // Filtro de placas para IN_HOUSE
+    if (allowedPlates) {
+      const platesArray = allowedPlates.split(',').map(p => p.trim());
+      filters.cargas = { in: platesArray };
+    }
 
     // Obtener todos los registros para filtrar por fecha en JS
     const allDetails = await prisma.sMDetail.findMany({

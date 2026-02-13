@@ -121,8 +121,17 @@ export default function TraficoPage() {
   const loadPendienteData = async () => {
     try {
       setPendienteLoading(true)
+
+      // Si es IN_HOUSE, obtener sus placas permitidas
+      let allowedPlates = null
+      if (user?.role === 'IN_HOUSE' && user?.contractorId) {
+        const contractor = await contractorsApi.getContractorWithVehicles(user.contractorId)
+        allowedPlates = contractor.vehicles.map(v => v.plate).join(',')
+      }
+
       const result = await smApi.getPendienteData({
         ...pendienteFilters,
+        ...(allowedPlates && { allowedPlates }),
         page: pendientePage,
         limit: 50
       })

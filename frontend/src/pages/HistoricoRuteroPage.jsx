@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { History, ChevronDown, ChevronUp, Filter, Truck, Check, AlertCircle, XCircle, Download, Loader } from 'lucide-react'
 import { smApi } from '../services/smApi'
+import { contractorsApi } from '../services/contractorsApi'
+import { useAuthStore } from '../store/authStore'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import Card from '../components/Card'
 
 export default function HistoricoRuteroPage() {
+  const user = useAuthStore((state) => state.user)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
@@ -30,8 +33,17 @@ export default function HistoricoRuteroPage() {
   const loadHistoricoData = async () => {
     try {
       setLoading(true)
+
+      // Si es IN_HOUSE, obtener sus placas permitidas
+      let allowedPlates = null
+      if (user?.role === 'IN_HOUSE' && user?.contractorId) {
+        const contractor = await contractorsApi.getContractorWithVehicles(user.contractorId)
+        allowedPlates = contractor.vehicles.map(v => v.plate).join(',')
+      }
+
       const result = await smApi.getHistoricoData({
         ...filters,
+        ...(allowedPlates && { allowedPlates }),
         page,
         limit: 100
       })
