@@ -29,10 +29,10 @@ const coerceValue = (value) => {
   return isNaN(num) ? 0 : num;
 };
 
-// Convertir número de serie de Excel a fecha en formato "DD-Mmm" o "DD-Mmm-YYYY"
+// Convertir número de serie de Excel a fecha en formato "DD-MM-YYYY"
 const convertExcelDateToString = (value) => {
   // Si ya es un string de fecha válido, devolverlo
-  if (typeof value === 'string' && value.match(/^\d{1,2}-[a-z]{3}(-\d{4})?$/i)) {
+  if (typeof value === 'string' && value.match(/^\d{1,2}-\d{1,2}-\d{4}$/)) {
     return value;
   }
 
@@ -54,20 +54,12 @@ const convertExcelDateToString = (value) => {
     return value?.toString() || '';
   }
 
-  // Convertir a formato "DD-Mmm" o "DD-Mmm-YYYY"
-  const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  // Convertir a formato "DD-MM-YYYY"
   const day = String(date.getDate()).padStart(2, '0');
-  const month = months[date.getMonth()];
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() retorna 0-11
   const year = date.getFullYear();
 
-  // Si el año es 2026 (año actual típicamente), no incluir año
-  // Si es otro año, incluirlo
-  const currentYear = new Date().getFullYear();
-  if (year === currentYear) {
-    return `${day}-${month}`;
-  } else {
-    return `${day}-${month}-${year}`;
-  }
+  return `${day}-${month}-${year}`;
 };
 
 // Get all SM uploads with details
@@ -344,6 +336,82 @@ export const uploadSMFile = async (req, res, next) => {
     }
   } catch (error) {
     console.error("❌ Error general:", error);
+    next(error);
+  }
+};
+
+// Get all SM details for pending traffic (entregas without status from past dates)
+export const getPendienteData = async (req, res, next) => {
+  try {
+    const { ruta, ciudad, codCliente, nombreCliente, page = 1, limit = 50 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Construir filtros
+    const filters = {};
+
+    if (ruta) filters.ruta = { contains: ruta, mode: "insensitive" };
+    if (ciudad) filters.ciudad = { contains: ciudad, mode: "insensitive" };
+    if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
+    if (nombreCliente) filters.nombreCliente = { contains: nombreCliente, mode: "insensitive" };
+
+    // Obtener todos los registros que NO tienen estado asignado
+    const allDetails = await prisma.sMDetail.findMany({
+      where: {
+        ...filters,
+        deliveryStatus: null // Sin estado asignado
+      },
+      include: {
+        smUpload: {
+          select: {
+            id: true,
+            fileName: true,
+            createdAt: true,
+          },
+        },
+        deliveryStatus: {
+          select: {
+            id: true,
+          },
+        },
+      },
+      orderBy: { fecha: "desc" },
+    });
+
+    // Filtrar solo registros PASADOS (no de hoy)
+    const pendienteDetails = allDetails.filter(d => isFechaPast(d.fecha));
+
+    // Agrupar por numCarga para calcular fechas representadas
+    const groupedByNumCarga = {};
+    for (const detail of pendienteDetails) {
+      if (!groupedByNumCarga[detail.numCarga]) {
+        groupedByNumCarga[detail.numCarga] = {
+          fechas: new Set(),
+          entregas: []
+        };
+      }
+      groupedByNumCarga[detail.numCarga].fechas.add(detail.fecha);
+      groupedByNumCarga[detail.numCarga].entregas.push(detail);
+    }
+
+    // Convertir Set de fechas a array ordenado descendente
+    const detallesProcesados = pendienteDetails.map(d => ({
+      ...d,
+      fechasRepresentadas: Array.from(groupedByNumCarga[d.numCarga].fechas).sort().reverse()
+    }));
+
+    // Aplicar paginación después de filtrar
+    const paginatedDetails = detallesProcesados.slice(skip, skip + parseInt(limit));
+
+    res.json({
+      details: paginatedDetails,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: pendienteDetails.length,
+        pages: Math.ceil(pendienteDetails.length / parseInt(limit)),
+      },
+    });
+  } catch (error) {
     next(error);
   }
 };
@@ -668,6 +736,77 @@ export const exportHistoricoExcel = async (req, res, next) => {
     res.send(buffer);
   } catch (error) {
     console.error("Error exporting to Excel:", error);
+    next(error);
+  }
+};
+
+// Get dashboard statistics for SM module
+export const getDashboardStats = async (req, res, next) => {
+  try {
+    // Obtener todos los SMDetail con deliveryStatus incluido
+    const allDetails = await prisma.sMDetail.findMany({
+      include: {
+        deliveryStatus: {
+          include: {
+            status: {
+              select: {
+                id: true,
+                nombre: true,
+                color: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // HOY
+    const todayDetails = allDetails.filter(d => isFechaToday(d.fecha));
+    const todayTotal = todayDetails.length;
+    const todayConEstado = todayDetails.filter(d => d.deliveryStatus).length;
+    const todaySinEstado = todayTotal - todayConEstado;
+    const todayPorcentaje = todayTotal > 0 ? Math.round((todayConEstado / todayTotal) * 100) : 0;
+
+    // PENDIENTES (pasadas sin estado)
+    const pendientesTotal = allDetails.filter(d => isFechaPast(d.fecha) && !d.deliveryStatus).length;
+
+    // ESTADOS DEL DÍA (solo entregas de hoy con estado)
+    // Agrupar por status.nombre
+    const estadosMap = {};
+    todayDetails.filter(d => d.deliveryStatus?.status).forEach(d => {
+      const nombre = d.deliveryStatus.status.nombre;
+      const color = d.deliveryStatus.status.color;
+      estadosMap[nombre] = { nombre, color, count: (estadosMap[nombre]?.count || 0) + 1 };
+    });
+    const estadosHoy = Object.values(estadosMap);
+
+    // CIUDADES DEL DÍA
+    const ciudadesMap = {};
+    todayDetails.forEach(d => {
+      if (!ciudadesMap[d.ciudad]) {
+        ciudadesMap[d.ciudad] = { ciudad: d.ciudad, total: 0, exitosas: 0, parciales: 0, noExitosas: 0, sinEstado: 0 };
+      }
+      ciudadesMap[d.ciudad].total++;
+      const nombre = d.deliveryStatus?.status?.nombre?.toUpperCase();
+      if (nombre === 'EXITOSA') ciudadesMap[d.ciudad].exitosas++;
+      else if (nombre === 'PARCIAL') ciudadesMap[d.ciudad].parciales++;
+      else if (nombre === 'NO EXITOSA') ciudadesMap[d.ciudad].noExitosas++;
+      else ciudadesMap[d.ciudad].sinEstado++;
+    });
+    const ciudadesHoy = Object.values(ciudadesMap).sort((a, b) => b.total - a.total);
+
+    // TOTALES GENERALES (todo el histórico)
+    const totalHistorico = allDetails.length;
+    const totalConEstado = allDetails.filter(d => d.deliveryStatus).length;
+
+    res.json({
+      hoy: { total: todayTotal, conEstado: todayConEstado, sinEstado: todaySinEstado, porcentaje: todayPorcentaje },
+      pendientes: { total: pendientesTotal },
+      estadosHoy,
+      ciudadesHoy,
+      totales: { total: totalHistorico, conEstado: totalConEstado },
+    });
+  } catch (error) {
     next(error);
   }
 };

@@ -33,6 +33,12 @@ export const smApi = {
     return data
   },
 
+  // Obtener datos de tráfico pendiente (sin estado de fechas pasadas)
+  getPendienteData: async (params = {}) => {
+    const { data } = await axios.get(`${API_URL}/sm/pendiente`, { params })
+    return data
+  },
+
   // Obtener datos históricos (solo entregas pasadas)
   getHistoricoData: async (params = {}) => {
     const { data } = await axios.get(`${API_URL}/sm/historico`, { params })
@@ -55,5 +61,11 @@ export const smApi = {
     link.click()
     link.remove()
     window.URL.revokeObjectURL(url)
+  },
+
+  // Obtener estadísticas del dashboard
+  getDashboardStats: async () => {
+    const { data } = await axios.get(`${API_URL}/sm/stats`)
+    return data
   }
 }
