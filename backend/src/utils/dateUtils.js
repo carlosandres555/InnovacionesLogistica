@@ -1,95 +1,124 @@
-// Parser and comparators for Spanish date format strings
-// Supports: "11-Feb", "11-Feb-2026"
-
-const monthMap = {
-  'ene': 0, 'enero': 0,
-  'feb': 1, 'febrero': 1,
-  'mar': 2, 'marzo': 2,
-  'abr': 3, 'abril': 3,
-  'may': 4, 'mayo': 4,
-  'jun': 5, 'junio': 5,
-  'jul': 6, 'julio': 6,
-  'ago': 7, 'agosto': 7,
-  'sep': 8, 'septiembre': 8, 'setiembre': 8,
-  'oct': 9, 'octubre': 9,
-  'nov': 10, 'noviembre': 10,
-  'dic': 11, 'diciembre': 11
-};
+// Parser and comparators for date format strings
+// Supports: "DD-MM-YYYY" format (e.g., "12-02-2026")
 
 /**
- * Parse Spanish date string like "11-Feb" or "11-Feb-2026" to Date object
- * @param {string} fechaStr - Date string in format DD-Mmm or DD-Mmm-YYYY
+ * Parse date string like "12-02-2026" to Date object (UTC midnight)
+ * @param {string} fechaStr - Date string in format DD-MM-YYYY
  * @returns {Date|null} - Parsed date or null if invalid
  */
 export const parseFechaString = (fechaStr) => {
   if (!fechaStr || typeof fechaStr !== 'string') return null;
 
-  const normalized = fechaStr.toLowerCase().trim();
-  // Match: DD-Mmm or DD-Mmm-YYYY
-  const match = normalized.match(/^(\d{1,2})-([a-z]+)(-(\d{4}))?$/);
+  const trimmed = fechaStr.trim();
+  // Match: DD-MM-YYYY
+  const match = trimmed.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
 
   if (!match) return null;
 
   const day = parseInt(match[1]);
-  const monthStr = match[2];
-  const month = monthMap[monthStr];
-  const year = match[4] ? parseInt(match[4]) : new Date().getFullYear();
+  const month = parseInt(match[2]) - 1; // Convert to 0-indexed month
+  const year = parseInt(match[3]);
 
-  if (month === undefined || isNaN(day) || isNaN(year)) return null;
+  if (isNaN(day) || isNaN(month + 1) || isNaN(year)) return null;
+  if (day < 1 || day > 31 || month + 1 < 1 || month + 1 > 12) return null;
 
-  const date = new Date(year, month, day);
+  // Create UTC date at midnight
+  const date = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
 
   // Validate the date is real (e.g., Feb 30 would be invalid)
-  if (date.getDate() !== day || date.getMonth() !== month) return null;
+  if (date.getUTCDate() !== day || date.getUTCMonth() !== month || date.getUTCFullYear() !== year) return null;
 
   return date;
 };
 
 /**
- * Check if a date string represents today's date
- * @param {string} fechaStr - Date string
- * @returns {boolean} - True if date is today
+ * Check if a date string represents today's date (in Colombia timezone GMT-5)
+ * @param {string} fechaStr - Date string in format DD-MM-YYYY
+ * @returns {boolean} - True if date is today in Colombia
  */
 export const isFechaToday = (fechaStr) => {
-  const fecha = parseFechaString(fechaStr);
-  if (!fecha) return false;
+  if (!fechaStr || typeof fechaStr !== 'string') return false;
 
-  const today = new Date();
-  return fecha.getDate() === today.getDate() &&
-         fecha.getMonth() === today.getMonth() &&
-         fecha.getFullYear() === today.getFullYear();
+  const trimmed = fechaStr.trim();
+  // Match: DD-MM-YYYY
+  const match = trimmed.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (!match) return false;
+
+  const day = parseInt(match[1]);
+  const month = parseInt(match[2]);
+  const year = parseInt(match[3]);
+
+  // Get today's date in Colombia (GMT-5)
+  const now = new Date();
+  const colombiaDate = new Date(now.getTime() - (5 * 60 * 60 * 1000)); // GMT-5
+
+  const todayDay = colombiaDate.getUTCDate();
+  const todayMonth = colombiaDate.getUTCMonth() + 1;
+  const todayYear = colombiaDate.getUTCFullYear();
+
+  return day === todayDay && month === todayMonth && year === todayYear;
 };
 
 /**
- * Check if a date string represents a past date
- * @param {string} fechaStr - Date string
- * @returns {boolean} - True if date is in the past (before today)
+ * Check if a date string represents a past date (in Colombia timezone GMT-5)
+ * @param {string} fechaStr - Date string in format DD-MM-YYYY
+ * @returns {boolean} - True if date is before today in Colombia
  */
 export const isFechaPast = (fechaStr) => {
-  const fecha = parseFechaString(fechaStr);
-  if (!fecha) return false;
+  if (!fechaStr || typeof fechaStr !== 'string') return false;
 
-  const today = new Date();
-  // Normalize to midnight to compare only dates, not times
-  today.setHours(0, 0, 0, 0);
-  fecha.setHours(0, 0, 0, 0);
+  const trimmed = fechaStr.trim();
+  // Match: DD-MM-YYYY
+  const match = trimmed.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (!match) return false;
 
-  return fecha < today;
+  const day = parseInt(match[1]);
+  const month = parseInt(match[2]);
+  const year = parseInt(match[3]);
+
+  // Get today's date in Colombia (GMT-5)
+  const now = new Date();
+  const colombiaDate = new Date(now.getTime() - (5 * 60 * 60 * 1000)); // GMT-5
+
+  const todayDay = colombiaDate.getUTCDate();
+  const todayMonth = colombiaDate.getUTCMonth() + 1;
+  const todayYear = colombiaDate.getUTCFullYear();
+
+  // Compare as numeric dates (YYYYMMDD)
+  const dateNum = year * 10000 + month * 100 + day;
+  const todayNum = todayYear * 10000 + todayMonth * 100 + todayDay;
+
+  return dateNum < todayNum;
 };
 
 /**
- * Check if a date string represents a future date
- * @param {string} fechaStr - Date string
- * @returns {boolean} - True if date is in the future (after today)
+ * Check if a date string represents a future date (in Colombia timezone GMT-5)
+ * @param {string} fechaStr - Date string in format DD-MM-YYYY
+ * @returns {boolean} - True if date is after today in Colombia
  */
 export const isFechaFuture = (fechaStr) => {
-  const fecha = parseFechaString(fechaStr);
-  if (!fecha) return false;
+  if (!fechaStr || typeof fechaStr !== 'string') return false;
 
-  const today = new Date();
-  // Normalize to midnight to compare only dates, not times
-  today.setHours(0, 0, 0, 0);
-  fecha.setHours(0, 0, 0, 0);
+  const trimmed = fechaStr.trim();
+  // Match: DD-MM-YYYY
+  const match = trimmed.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (!match) return false;
 
-  return fecha > today;
+  const day = parseInt(match[1]);
+  const month = parseInt(match[2]);
+  const year = parseInt(match[3]);
+
+  // Get today's date in Colombia (GMT-5)
+  const now = new Date();
+  const colombiaDate = new Date(now.getTime() - (5 * 60 * 60 * 1000)); // GMT-5
+
+  const todayDay = colombiaDate.getUTCDate();
+  const todayMonth = colombiaDate.getUTCMonth() + 1;
+  const todayYear = colombiaDate.getUTCFullYear();
+
+  // Compare as numeric dates (YYYYMMDD)
+  const dateNum = year * 10000 + month * 100 + day;
+  const todayNum = todayYear * 10000 + todayMonth * 100 + todayDay;
+
+  return dateNum > todayNum;
 };

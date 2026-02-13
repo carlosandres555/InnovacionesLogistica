@@ -4,7 +4,7 @@ import { deliveryStatusApi } from '../services/deliveryStatusApi'
 import Button from './Button'
 import Input from './Input'
 
-export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }) {
+export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave, showFechaEntrega = false }) {
   const [statuses, setStatuses] = useState([])
   const [reasons, setReasons] = useState([])
   const [loading, setLoading] = useState(true)
@@ -16,6 +16,7 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
     reasonId: '',
     observaciones: '',
     recogioDevoluccion: false,
+    fechaEntrega: '',
   })
 
   useEffect(() => {
@@ -36,11 +37,19 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
       // Load current status if exists
       const currentStatus = await deliveryStatusApi.getEntregaStatus(entrega.id)
       if (currentStatus) {
+        // Convertir fechaEntrega ISO a formato YYYY-MM-DD para el input date
+        let fechaEntregaValue = ''
+        if (currentStatus.fechaEntrega) {
+          const date = new Date(currentStatus.fechaEntrega)
+          fechaEntregaValue = date.toISOString().split('T')[0]
+        }
+
         setFormData({
           statusId: currentStatus.status?.id || '',
           reasonId: currentStatus.reason?.id || '',
           observaciones: currentStatus.observaciones || '',
           recogioDevoluccion: currentStatus.recogioDevoluccion || false,
+          fechaEntrega: fechaEntregaValue,
         })
 
         // Load reasons for current status
@@ -105,7 +114,8 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
         formData.statusId,
         formData.reasonId || null,
         formData.observaciones,
-        formData.recogioDevoluccion
+        formData.recogioDevoluccion,
+        formData.fechaEntrega || null
       )
 
       onSave()
@@ -222,6 +232,26 @@ export default function DeliveryStatusModal({ entrega, isOpen, onClose, onSave }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
+
+              {/* Fecha de Entrega - Conditional */}
+              {showFechaEntrega && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Fecha de Entrega
+                  </label>
+                  <input
+                    type="date"
+                    name="fechaEntrega"
+                    value={formData.fechaEntrega}
+                    onChange={handleInputChange}
+                    disabled={submitting}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Ingrese la fecha real de entrega para entregas atrasadas
+                  </p>
+                </div>
+              )}
 
               {/* Recogió Devolución Checkbox */}
               <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">

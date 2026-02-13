@@ -242,6 +242,7 @@ model EntregaDeliveryStatus {
   reasonId String?
   observaciones String?
   recogioDevoluccion Boolean @default(false) // Indica si recogió devolución
+  fechaEntrega DateTime? // Fecha real de entrega (para entregas atrasadas sin fecha conocida)
   updatedBy User? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
   updatedById String?
   updatedAt DateTime @updatedAt

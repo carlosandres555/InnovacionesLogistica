@@ -146,7 +146,7 @@ export const createDeliveryStatusReason = async (req, res, next) => {
 export const updateEntregaDeliveryStatus = async (req, res, next) => {
   try {
     const { entregaId } = req.params;
-    const { statusId, reasonId, observaciones, recogioDevoluccion } = req.body;
+    const { statusId, reasonId, observaciones, recogioDevoluccion, fechaEntrega } = req.body;
 
     if (!statusId) {
       return res.status(400).json({ error: "statusId es requerido" });
@@ -181,6 +181,9 @@ export const updateEntregaDeliveryStatus = async (req, res, next) => {
       return res.status(404).json({ error: "Entrega no encontrada" });
     }
 
+    // Convertir fechaEntrega a Date si se proporciona
+    const fechaEntregaDate = fechaEntrega ? new Date(fechaEntrega) : null;
+
     // Crear o actualizar el estado de entrega
     const entregaStatus = await prisma.entregaDeliveryStatus.upsert({
       where: { entregaId },
@@ -189,6 +192,7 @@ export const updateEntregaDeliveryStatus = async (req, res, next) => {
         reasonId: reasonId || null,
         observaciones,
         recogioDevoluccion: recogioDevoluccion || false,
+        fechaEntrega: fechaEntregaDate,
         updatedById: req.user.id,
         updatedAt: new Date(),
       },
@@ -198,6 +202,7 @@ export const updateEntregaDeliveryStatus = async (req, res, next) => {
         reasonId: reasonId || null,
         observaciones,
         recogioDevoluccion: recogioDevoluccion || false,
+        fechaEntrega: fechaEntregaDate,
         updatedById: req.user.id,
       },
       select: {
@@ -218,6 +223,7 @@ export const updateEntregaDeliveryStatus = async (req, res, next) => {
         },
         observaciones: true,
         recogioDevoluccion: true,
+        fechaEntrega: true,
         updatedAt: true,
       },
     });
@@ -255,6 +261,7 @@ export const getEntregaDeliveryStatus = async (req, res, next) => {
         },
         observaciones: true,
         recogioDevoluccion: true,
+        fechaEntrega: true,
         updatedAt: true,
         updatedBy: {
           select: {
