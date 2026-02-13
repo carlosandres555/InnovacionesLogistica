@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Menu, X, LogOut, Home, Users, Zap, Upload, Settings, History } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
@@ -7,6 +7,7 @@ export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { logout, user } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleLogout = () => {
     logout()
@@ -59,14 +60,23 @@ export default function Layout({ children }) {
         <nav className="mt-8 space-y-2 px-3">
           {menuItems.map(item => {
             const Icon = item.icon
+            const isActive = location.pathname === item.href
             return (
               <Link
                 key={item.href}
                 to={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors duration-200 text-sm sm:text-base group"
+                className={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 text-sm sm:text-base group ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
               >
-                <Icon className="w-5 h-5 mr-3 flex-shrink-0 group-hover:text-blue-400 transition-colors" />
+                <Icon className={`w-5 h-5 mr-3 flex-shrink-0 transition-colors ${
+                  isActive
+                    ? 'text-white'
+                    : 'group-hover:text-blue-400'
+                }`} />
                 <span className="font-medium">{item.label}</span>
               </Link>
             )
