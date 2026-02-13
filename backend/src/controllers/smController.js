@@ -419,7 +419,7 @@ export const getPendienteData = async (req, res, next) => {
 // Get all SM details for tráfico (only today's records - editable)
 export const getTraficoData = async (req, res, next) => {
   try {
-    const { ruta, ciudad, codCliente, nombreCliente, page = 1, limit = 50 } = req.query;
+    const { ruta, ciudad, codCliente, nombreCliente, allowedPlates, page = 1, limit = 50 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Construir filtros (sin fecha, solo otros filtros)
@@ -429,6 +429,12 @@ export const getTraficoData = async (req, res, next) => {
     if (ciudad) filters.ciudad = { contains: ciudad, mode: "insensitive" };
     if (codCliente) filters.codCliente = { contains: codCliente, mode: "insensitive" };
     if (nombreCliente) filters.nombreCliente = { contains: nombreCliente, mode: "insensitive" };
+
+    // Filtro de placas para IN_HOUSE (formato: "placa1,placa2,placa3")
+    if (allowedPlates) {
+      const platesArray = allowedPlates.split(',').map(p => p.trim());
+      filters.cargas = { in: platesArray };
+    }
 
     // Obtener todos los registros (sin paginación en BD) y filtrar por fecha en JS
     const allDetails = await prisma.sMDetail.findMany({

@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { Zap, ChevronDown, ChevronUp, Filter, Truck, Check, AlertCircle, XCircle, Loader, Edit } from 'lucide-react'
 import { smApi } from '../services/smApi'
 import { deliveryStatusApi } from '../services/deliveryStatusApi'
+import { contractorsApi } from '../services/contractorsApi'
+import { useAuthStore } from '../store/authStore'
 import DeliveryStatusModal from '../components/DeliveryStatusModal'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import Card from '../components/Card'
 
 export default function TraficoPage() {
+  const { user } = useAuthStore()
   // TAB STATE
   const [activeTab, setActiveTab] = useState('hoy')
 
@@ -89,8 +92,17 @@ export default function TraficoPage() {
   const loadTraficoData = async () => {
     try {
       setLoading(true)
+
+      // Si es IN_HOUSE, obtener sus placas permitidas
+      let allowedPlates = null
+      if (user?.role === 'IN_HOUSE' && user?.contractorId) {
+        const contractor = await contractorsApi.getContractorWithVehicles(user.contractorId)
+        allowedPlates = contractor.vehicles.map(v => v.plate).join(',')
+      }
+
       const result = await smApi.getTraficoData({
         ...filters,
+        ...(allowedPlates && { allowedPlates }),
         page,
         limit: 500
       })
