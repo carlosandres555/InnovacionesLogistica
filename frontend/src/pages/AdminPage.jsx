@@ -5,6 +5,7 @@ import { rolesApi } from '../services/rolesApi'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import Card from '../components/Card'
+import ContractorsManagement from '../components/ContractorsManagement'
 
 // Módulos disponibles
 const ALL_MODULES = [
@@ -695,6 +696,9 @@ export default function AdminPage() {
           </ol>
         </div>
       </Card>
+
+      {/* Gestión de Empresas y Carros */}
+      <ContractorsManagement />
     </div>
   )
 }
