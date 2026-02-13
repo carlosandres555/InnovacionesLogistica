@@ -1,5 +1,5 @@
 // Test deploy - 2026-02-08
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
@@ -22,12 +22,38 @@ import Layout from './components/Layout'
 const queryClient = new QueryClient()
 
 function App() {
-  const { isAuthenticated, initializeAuth } = useAuthStore()
+  const { isAuthenticated, initializeAuth, refreshPermissions } = useAuthStore()
+  const pollIntervalRef = useRef(null)
 
   useEffect(() => {
     initializeAuth()
     setupAxiosInterceptors(() => useAuthStore.getState())
   }, [])
+
+  // Polling para refrescar permisos cada 2 minutos
+  useEffect(() => {
+    if (!isAuthenticated) {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+        pollIntervalRef.current = null
+      }
+      return
+    }
+
+    // Refrescar permisos inmediatamente
+    refreshPermissions()
+
+    // Luego cada 2 minutos
+    pollIntervalRef.current = setInterval(() => {
+      refreshPermissions()
+    }, 2 * 60 * 1000) // 2 minutos
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+      }
+    }
+  }, [isAuthenticated, refreshPermissions])
 
   return (
     <QueryClientProvider client={queryClient}>

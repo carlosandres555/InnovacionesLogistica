@@ -13,8 +13,8 @@ export const ROLE_PERMISSIONS = {
     description: 'Gestión de tráfico e histórico'
   },
   IN_HOUSE: {
-    modules: ['dashboard', 'trafico', 'historicoRutero'],
-    description: 'Visualización de tráfico e histórico'
+    modules: ['trafico'],
+    description: 'Visualización de tráfico solamente'
   },
   CUSTOMER: {
     modules: ['dashboard'],

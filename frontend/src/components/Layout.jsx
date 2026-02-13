@@ -14,14 +14,16 @@ export default function Layout({ children }) {
   }
 
   const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: Home, permission: 'dashboard' },
+    ...(user?.permissions?.modules?.includes('dashboard')
+      ? [{ href: '/dashboard', label: 'Dashboard', icon: Home, permission: 'dashboard' }]
+      : []),
     ...(user?.role === 'ADMIN'
       ? [{ href: '/users', label: 'Usuarios', icon: Users, permission: 'users' }]
       : []),
     ...(user?.permissions?.modules?.includes('trafico')
       ? [{ href: '/trafico', label: 'Tráfico', icon: Zap, permission: 'trafico' }]
       : []),
-    ...(user?.permissions?.modules?.includes('trafico')
+    ...(user?.permissions?.modules?.includes('historicoRutero')
       ? [{ href: '/historico-rutero', label: 'Histórico Rutero', icon: History, permission: 'historicoRutero' }]
       : []),
     ...(user?.permissions?.modules?.includes('cargaInformacion')

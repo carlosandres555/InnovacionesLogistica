@@ -99,6 +99,16 @@ export const useAuthStore = create(
         if (state.accessToken) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${state.accessToken}`
         }
+      },
+
+      refreshPermissions: async () => {
+        try {
+          // Refrescar token para obtener permisos actualizados
+          await get().refreshAccessToken()
+        } catch (error) {
+          console.error('Error refrescando permisos:', error)
+          // No hacer logout silenciosamente, dejar que el usuario continúe
+        }
       }
     }),
     {
