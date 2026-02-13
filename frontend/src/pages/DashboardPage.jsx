@@ -87,9 +87,17 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="animate-fade-in-up">
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">Estadísticas del módulo SM - Entregas y Tráfico</p>
+      <div className="animate-fade-in-up flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-2">Dashboard</h1>
+          <p className="text-gray-600">Estadísticas del módulo SM - Entregas y Tráfico</p>
+        </div>
+        <button
+          onClick={loadStats}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+        >
+          Actualizar
+        </button>
       </div>
 
       {/* KPI Cards Row 1 */}
@@ -249,16 +257,6 @@ export default function DashboardPage() {
           <div className="text-center py-8 text-gray-500">Sin entregas para hoy</div>
         )}
       </Card>
-
-      {/* Refresh Button */}
-      <div className="flex justify-center">
-        <button
-          onClick={loadStats}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Actualizar Estadísticas
-        </button>
-      </div>
     </div>
   )
 }
