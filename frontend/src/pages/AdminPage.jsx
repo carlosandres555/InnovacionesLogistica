@@ -23,6 +23,9 @@ const ROLE_COLORS = {
 }
 
 export default function AdminPage() {
+  // Tab activo
+  const [activeTab, setActiveTab] = useState('estados')
+
   // Estados para Delivery Status
   const [statuses, setStatuses] = useState([])
   const [loading, setLoading] = useState(true)
@@ -289,7 +292,7 @@ export default function AdminPage() {
         <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-2">
           Administración
         </h1>
-        <p className="text-gray-600">Gestiona los estados de entrega y permisos</p>
+        <p className="text-gray-600">Gestiona estados, roles, empresas y permisos</p>
       </div>
 
       {/* Mensajes */}
@@ -307,8 +310,84 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Sección: Estados Actuales */}
-      <Card>
+      {/* Tab Selector - 3 Cards Principales */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Card 1: Estados de Entrega */}
+        <Card
+          className={`cursor-pointer transition-all transform hover:shadow-lg ${
+            activeTab === 'estados'
+              ? 'ring-2 ring-blue-500 shadow-lg bg-blue-50'
+              : 'hover:shadow-md'
+          }`}
+          onClick={() => setActiveTab('estados')}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-slate-900">📋 Estados de Entrega</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {statuses.length} estados creados
+              </p>
+            </div>
+            <ChevronDown
+              className={`w-6 h-6 text-blue-600 transition-transform ${
+                activeTab === 'estados' ? 'rotate-180' : ''
+              }`}
+            />
+          </div>
+        </Card>
+
+        {/* Card 2: Roles y Permisos */}
+        <Card
+          className={`cursor-pointer transition-all transform hover:shadow-lg ${
+            activeTab === 'roles'
+              ? 'ring-2 ring-green-500 shadow-lg bg-green-50'
+              : 'hover:shadow-md'
+          }`}
+          onClick={() => setActiveTab('roles')}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-slate-900">🛡️ Roles y Permisos</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {roles.length} roles configurados
+              </p>
+            </div>
+            <ChevronDown
+              className={`w-6 h-6 text-green-600 transition-transform ${
+                activeTab === 'roles' ? 'rotate-180' : ''
+              }`}
+            />
+          </div>
+        </Card>
+
+        {/* Card 3: Empresas y Carros */}
+        <Card
+          className={`cursor-pointer transition-all transform hover:shadow-lg ${
+            activeTab === 'empresas'
+              ? 'ring-2 ring-purple-500 shadow-lg bg-purple-50'
+              : 'hover:shadow-md'
+          }`}
+          onClick={() => setActiveTab('empresas')}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-slate-900">🏢 Empresas y Carros</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Gestión de contratistas
+              </p>
+            </div>
+            <ChevronDown
+              className={`w-6 h-6 text-purple-600 transition-transform ${
+                activeTab === 'empresas' ? 'rotate-180' : ''
+              }`}
+            />
+          </div>
+        </Card>
+      </div>
+
+      {/* CONTENIDO: Estados de Entrega */}
+      {activeTab === 'estados' && (
+      <Card className="animate-slide-in-left">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-900">Estados de Entrega</h2>
           <Button
@@ -568,21 +647,24 @@ export default function AdminPage() {
             ))}
           </div>
         )}
+
+        {/* Información */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+          <h3 className="text-sm font-semibold text-blue-900 mb-2">ℹ️ Información</h3>
+          <ul className="text-sm text-blue-800 space-y-1 ml-4">
+            <li>• Los estados creados aparecerán automáticamente en el selector de Tráfico</li>
+            <li>• No se pueden eliminar estados una vez creados (para mantener historial)</li>
+            <li>• El color solo es para referencia visual</li>
+            <li>• Los usuarios con permiso pueden asignar estados a entregas en Tráfico</li>
+          </ul>
+        </div>
       </Card>
+      )}
 
-      {/* Información */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-blue-900 mb-2">ℹ️ Información</h3>
-        <ul className="text-sm text-blue-800 space-y-1 ml-4">
-          <li>• Los estados creados aparecerán automáticamente en el selector de Tráfico</li>
-          <li>• No se pueden eliminar estados una vez creados (para mantener historial)</li>
-          <li>• El color solo es para referencia visual</li>
-          <li>• Los usuarios con permiso pueden asignar estados a entregas en Tráfico</li>
-        </ul>
-      </div>
 
-      {/* SECCIÓN: Configuración de Roles y Permisos */}
-      <Card>
+      {/* CONTENIDO: Roles y Permisos */}
+      {activeTab === 'roles' && (
+      <Card className="animate-slide-in-left">
         <div className="flex items-center gap-2 mb-6">
           <Shield className="w-6 h-6 text-blue-600" />
           <h2 className="text-xl font-bold text-slate-900">Roles y Permisos</h2>
@@ -696,9 +778,14 @@ export default function AdminPage() {
           </ol>
         </div>
       </Card>
+      )}
 
-      {/* Gestión de Empresas y Carros */}
-      <ContractorsManagement />
+      {/* CONTENIDO: Empresas y Carros */}
+      {activeTab === 'empresas' && (
+        <div className="animate-slide-in-left">
+          <ContractorsManagement />
+        </div>
+      )}
     </div>
   )
 }
