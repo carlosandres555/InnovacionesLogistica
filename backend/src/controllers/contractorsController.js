@@ -53,25 +53,12 @@ export const createContractor = async (req, res, next) => {
       return res.status(400).json({ error: 'Nombre y email son requeridos' });
     }
 
-    // Crear usuario owner dummy
-    const ownerEmail = `owner-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}@contractors.com`;
-    const owner = await prisma.user.create({
-      data: {
-        email: ownerEmail,
-        password: 'dummy',
-        firstName: name,
-        lastName: 'Owner',
-        role: 'ADMIN'
-      }
-    });
-
     const contractor = await prisma.company.create({
       data: {
         name,
         description,
         email,
-        phone,
-        ownerId: owner.id
+        phone
       }
     });
 

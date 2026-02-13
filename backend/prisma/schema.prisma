@@ -69,8 +69,8 @@ model Company {
   state String?
   zipCode String?
   country String?
-  owner User @relation("CompanyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId String @unique
+  owner User? @relation("CompanyOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId String? @unique
   logo String?
   isActive Boolean @default(true)
   employees User[] @relation("CompanyEmployees")
