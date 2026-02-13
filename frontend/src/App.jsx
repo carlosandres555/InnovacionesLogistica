@@ -22,8 +22,30 @@ import Layout from './components/Layout'
 const queryClient = new QueryClient()
 
 function App() {
-  const { isAuthenticated, initializeAuth, refreshPermissions } = useAuthStore()
+  const { isAuthenticated, initializeAuth, refreshPermissions, user } = useAuthStore()
   const pollIntervalRef = useRef(null)
+
+  // Función para obtener el primer módulo activo del usuario
+  const getFirstActiveModule = () => {
+    if (!user?.permissions?.modules) return '/dashboard'
+
+    const modules = user.permissions.modules
+    const moduleRoutes = {
+      'dashboard': '/dashboard',
+      'trafico': '/trafico',
+      'historicoRutero': '/historico-rutero',
+      'cargaInformacion': '/carga-informacion'
+    }
+
+    // Retornar el primer módulo activo
+    for (const module of modules) {
+      if (moduleRoutes[module]) {
+        return moduleRoutes[module]
+      }
+    }
+
+    return '/dashboard' // Fallback si no hay módulos activos
+  }
 
   useEffect(() => {
     initializeAuth()
@@ -130,7 +152,7 @@ function App() {
           />
 
           {/* Catch all */}
-          <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
+          <Route path="/" element={<Navigate to={isAuthenticated ? getFirstActiveModule() : '/login'} replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
