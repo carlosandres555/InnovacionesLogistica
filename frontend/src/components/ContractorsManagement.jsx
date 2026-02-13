@@ -29,6 +29,7 @@ export default function ContractorsManagement() {
 
   const [showVehicleForm, setShowVehicleForm] = useState(null)
   const [deletingVehicle, setDeletingVehicle] = useState(null)
+  const [loadingVehicles, setLoadingVehicles] = useState({})
 
   useEffect(() => {
     loadContractors()
@@ -45,6 +46,27 @@ export default function ContractorsManagement() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadContractorVehicles = async (contractorId) => {
+    try {
+      setLoadingVehicles(prev => ({ ...prev, [contractorId]: true }))
+      setError(null)
+      const data = await contractorsApi.getContractorWithVehicles(contractorId)
+      // Actualizar el contractor en la lista con los vehículos cargados
+      setContractors(prev =>
+        prev.map(c =>
+          c.id === contractorId
+            ? { ...c, vehicles: data.vehicles }
+            : c
+        )
+      )
+    } catch (err) {
+      setError('Error al cargar vehículos')
+      console.error(err)
+    } finally {
+      setLoadingVehicles(prev => ({ ...prev, [contractorId]: false }))
     }
   }
 
@@ -247,7 +269,17 @@ export default function ContractorsManagement() {
         <div className="space-y-4">
           {contractors.map(contractor => (
             <Card key={contractor.id} className="animate-fade-in-up">
-              <div className="flex items-center justify-between cursor-pointer" onClick={() => setExpandedContractor(expandedContractor === contractor.id ? null : contractor.id)}>
+              <div
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => {
+                  const isExpanding = expandedContractor !== contractor.id
+                  setExpandedContractor(isExpanding ? contractor.id : null)
+                  // Cargar vehículos cuando se expande
+                  if (isExpanding && !contractor.vehicles) {
+                    loadContractorVehicles(contractor.id)
+                  }
+                }}
+              >
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-slate-900">{contractor.name}</h3>
                   <p className="text-sm text-gray-600">{contractor.description || 'Sin descripción'}</p>
@@ -273,7 +305,12 @@ export default function ContractorsManagement() {
                 <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
                   <h4 className="font-semibold text-slate-900">Vehículos ({contractor.vehicles?.length || 0})</h4>
 
-                  {showVehicleForm === contractor.id ? (
+                  {loadingVehicles[contractor.id] ? (
+                    <div className="text-center py-4">
+                      <Loader className="w-5 h-5 animate-spin mx-auto text-gray-400" />
+                      <p className="text-sm text-gray-600 mt-2">Cargando vehículos...</p>
+                    </div>
+                  ) : showVehicleForm === contractor.id ? (
                     <form onSubmit={(e) => handleAddVehicle(e, contractor.id)} className="space-y-3 p-3 bg-gray-50 rounded-lg">
                       <Input
                         name="plate"
