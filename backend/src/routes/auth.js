@@ -77,7 +77,7 @@ router.post('/register', async (req, res, next) => {
 
     // Generate tokens
     const accessToken = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, companyId: user.companyId },
+      { id: user.id, email: user.email, role: user.role, companyId: user.companyId, contractorId: user.contractorId },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
     )
@@ -101,6 +101,7 @@ router.post('/register', async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        contractorId: user.contractorId,
         permissions
       }
     })
@@ -147,7 +148,7 @@ router.post('/login', async (req, res, next) => {
 
     // Generate tokens
     const accessToken = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, companyId: user.companyId },
+      { id: user.id, email: user.email, role: user.role, companyId: user.companyId, contractorId: user.contractorId },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
     )
@@ -171,6 +172,7 @@ router.post('/login', async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        contractorId: user.contractorId,
         permissions
       }
     })
@@ -209,7 +211,7 @@ router.post('/refresh', async (req, res, next) => {
       }
 
       const newAccessToken = jwt.sign(
-        { id: user.id, email: user.email, role: user.role, companyId: user.companyId },
+        { id: user.id, email: user.email, role: user.role, companyId: user.companyId, contractorId: user.contractorId },
         process.env.JWT_SECRET || 'secret',
         { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
       )
@@ -225,6 +227,7 @@ router.post('/refresh', async (req, res, next) => {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
+          contractorId: user.contractorId,
           permissions
         }
       })
