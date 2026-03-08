@@ -73,4 +73,4 @@ aws cloudfront create-invalidation \
 echo "✅ CloudFront invalidation completed"
 echo ""
 echo "🎉 Frontend deployment completed successfully!"
-echo "URL: https://innovacioneslogistica.com (or http://52.201.18.118)"
+echo "URL: https://innovacioneslogistica.com (or http://100.31.155.173)"

@@ -5,7 +5,7 @@
 
 set -e
 
-EC2_HOST="52.201.18.118"
+EC2_HOST="100.31.155.173"
 EC2_USER="ubuntu"
 EC2_KEY="/Users/carlosrodriguez/Project/DistribucionCosta/innovaciones-logistica-key.pem"
 
