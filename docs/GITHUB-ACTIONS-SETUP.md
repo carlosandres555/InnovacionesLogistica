@@ -22,7 +22,7 @@ Click en **"New repository secret"** y agrega estos 6 secrets:
 
 ```
 Name: EC2_HOST
-Value: 52.201.18.118
+Value: 34.199.99.161
 
 Name: EC2_USER
 Value: ubuntu
@@ -171,7 +171,7 @@ git push origin master
 
 ```
 ✗ Deploy to EC2
-  Error: ssh: connect to host 52.201.18.118 port 22: Connection refused
+  Error: ssh: connect to host 34.199.99.161 port 22: Connection refused
 ```
 
 **Soluciones comunes:**
@@ -228,7 +228,7 @@ git push -f origin master
 ### Ver logs de EC2 después del deploy
 
 ```bash
-ssh -i ~/.ssh/innovaciones-logistica-key.pem ubuntu@52.201.18.118
+ssh -i ~/.ssh/innovaciones-logistica-key.pem ubuntu@34.199.99.161
 pm2 logs innovaciones-api
 ```
 

@@ -28,8 +28,21 @@ app.set('trust proxy', 1)
 
 // Middleware
 app.use(helmet())
+// Configure CORS to accept multiple origins
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'https://innovacioneslogistica.com',
+  'https://d5lpz2l1b1l41.cloudfront.net' // CloudFront domain name
+]
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true
 }))
 app.use(morgan('combined'))
@@ -39,7 +52,8 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }))
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  trustProxy: true // Trust X-Forwarded-For header from CloudFront/ALB
 })
 app.use('/api/', limiter)
 

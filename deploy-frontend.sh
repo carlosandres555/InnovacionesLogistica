@@ -41,6 +41,10 @@ fi
 # Build frontend
 echo "🔨 Building frontend..."
 cd frontend
+
+# Ensure production env is used
+export NODE_ENV="production"
+
 npm install
 npm run build
 
@@ -73,4 +77,4 @@ aws cloudfront create-invalidation \
 echo "✅ CloudFront invalidation completed"
 echo ""
 echo "🎉 Frontend deployment completed successfully!"
-echo "URL: https://innovacioneslogistica.com (or http://100.31.155.173)"
+echo "URL: https://innovacioneslogistica.com (or http://34.199.99.161)"

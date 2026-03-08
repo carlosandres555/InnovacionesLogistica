@@ -27,7 +27,7 @@ Para que el **deploy automático funcione**, necesitas hacer ESTO una sola vez:
 3. Click **"New repository secret"** y agrega estos 7 secretos:
 
 ```
-EC2_HOST              = 52.201.18.118
+EC2_HOST              = 34.199.99.161
 EC2_USER              = ubuntu
 EC2_KEY               = (contenido de tu .pem file)
 AWS_ACCESS_KEY_ID     = AKIATAIKEQVM62LPJFGZ
