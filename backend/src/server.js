@@ -23,6 +23,9 @@ import { errorHandler } from './middleware/errorHandler.js'
 // Initialize Express app
 const app = express()
 
+// Trust proxy (needed when behind CloudFront, ALB, or other proxies)
+app.set('trust proxy', 1)
+
 // Middleware
 app.use(helmet())
 app.use(cors({
